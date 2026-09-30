@@ -94,7 +94,8 @@ export default eventHandler(async (event) => {
       const userAgent = getHeader(event, 'user-agent') || ''
       const query = getQuery(event)
       const shouldRedirectWithQuery = link.redirectWithQuery ?? redirectWithQuery
-      const buildTarget = (url: string) => shouldRedirectWithQuery ? withQuery(url, query) : url
+      // Fork: only rebuild the URL when there is a query to append; withQuery re-encodes the target.
+      const buildTarget = (url: string) => shouldRedirectWithQuery && Object.keys(query).length ? withQuery(url, query) : url
 
       let targetUrl = link.url
       const country = event.context.cloudflare?.request?.cf?.country

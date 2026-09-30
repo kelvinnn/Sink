@@ -9,6 +9,7 @@ Fork of [miantiao-me/Sink](https://github.com/miantiao-me/Sink) with a few small
 | Admin gate: hides the dashboard, API and static files until a secret path is visited; `/api` also accepts the site token as bearer | `NUXT_ADMIN_GATE_PATH` | `worker/`, `wrangler.jsonc` (`main`, `assets.run_worker_first`), `package.json` deploy scripts |
 | `workers_dev` and `preview_urls` disabled, so the Worker is only reachable on its custom domain | — | `wrangler.jsonc` |
 | Fix: import file input was always disabled when `previewMode` is the default empty string (Vue treats `""` as true for `disabled`) | — | `app/components/dashboard/migrate/ImportForm.vue` |
+| With `redirectWithQuery`, the destination is only rebuilt when the request has a query string, so stored URLs are not re-encoded | — | `server/middleware/1.redirect.ts` |
 | Tests | — | `tests/tracking-page.spec.ts`, `tests/admin-gate.spec.ts` |
 
 Everything is off by default, so behaviour matches upstream until the settings are set.

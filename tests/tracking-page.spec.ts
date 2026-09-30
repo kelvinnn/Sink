@@ -59,6 +59,23 @@ describe('slugs with / and .', () => {
   })
 })
 
+describe('redirect with query', () => {
+  afterEach(() => {
+    env.NUXT_REDIRECT_WITH_QUERY = 'false'
+  })
+
+  it('keeps the stored URL byte-for-byte when there is no incoming query', async () => {
+    env.NUXT_REDIRECT_WITH_QUERY = 'true'
+    const slug = `rwq-${crypto.randomUUID()}`
+    const url = 'https://example.com/p?a[0]=x&t=%2CO%2CP-R'
+    await createLink(slug, url)
+    expect((await get(`/${slug}`)).headers.get('location')).toBe(url)
+
+    const withQuery = (await get(`/${slug}?utm_source=qr`)).headers.get('location')!
+    expect(new URL(withQuery).searchParams.get('utm_source')).toBe('qr')
+  })
+})
+
 describe('gTM tracking page', () => {
   it('redirects normally when NUXT_GTM_ID is unset', async () => {
     const slug = `gtm-off-${crypto.randomUUID()}`
