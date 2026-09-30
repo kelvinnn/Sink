@@ -63,7 +63,7 @@ export const SlugSchema = z.string().trim().max(2048).regex(new RegExp(slugRegex
 // Never apply this to stored or legacy KV records: links written before this check must
 // stay readable, exportable, and deletable.
 const NewSlugSchema = SlugSchema.refine(
-  slug => !reservedSlugs.has(slug.toLowerCase()),
+  slug => !reservedSlugs.has(slug.split('/')[0]!.toLowerCase()),
   'slug is reserved',
 )
 const TimestampSchema = z.number().int().safe()

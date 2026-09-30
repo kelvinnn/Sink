@@ -67,7 +67,9 @@ export default eventHandler(async (event) => {
     return
   }
 
-  if (slug && !reserveSlug.includes(slug) && slugRegex.test(slug) && cloudflare) {
+  // Slugs may contain `/`, so reserve by first path segment (keeps /dashboard/** and /api/** out).
+  const firstSegment = slug.split('/')[0]!.toLowerCase()
+  if (slug && !reserveSlug.includes(firstSegment) && slugRegex.test(slug) && cloudflare) {
     let link: Link | null = null
 
     const lowerCaseSlug = slug.toLowerCase()
@@ -190,6 +192,8 @@ export default eventHandler(async (event) => {
       }
 
       if (deviceRedirectUrl) {
+        if (shouldServeTrackingPage(event, link))
+          return sendNoStoreHtml(generateTrackingHtml(event, link, finalTargetUrl))
         if (redirectNoStore)
           setHeader(event, 'Cache-Control', 'no-store')
         return sendRedirect(event, finalTargetUrl, +redirectStatusCode)
@@ -216,6 +220,9 @@ export default eventHandler(async (event) => {
         setHeader(event, 'Cache-Control', 'no-store, private')
         return html
       }
+
+      if (shouldServeTrackingPage(event, link))
+        return sendNoStoreHtml(generateTrackingHtml(event, link, finalTargetUrl))
 
       if (redirectNoStore)
         setHeader(event, 'Cache-Control', 'no-store')

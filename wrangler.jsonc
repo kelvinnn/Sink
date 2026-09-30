@@ -1,11 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sink",
-  "main": ".output/server/index.mjs",
+  "main": "worker/index.mjs", // Nitro build wrapped with the optional admin gate
   "assets": {
     "binding": "ASSETS",
     "directory": ".output/public",
-    "html_handling": "drop-trailing-slash"
+    "html_handling": "drop-trailing-slash",
+    // Static files go through the Worker so the admin gate can hide them.
+    "run_worker_first": true
   },
   "compatibility_date": "2025-05-08",
   "compatibility_flags": [

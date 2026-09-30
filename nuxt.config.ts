@@ -39,6 +39,10 @@ export default defineNuxtConfig({
     safeBrowsingDoh: '', // Set to DoH URL to enable auto-detection, e.g. https://family.cloudflare-dns.com/dns-query
     webhookUrl: '',
     webhookSecret: '',
+    // Fork: GTM tracking page before redirect. Empty gtmId disables it.
+    gtmId: '',
+    gtmSkipTags: 'internal,hiring',
+    gtmMaxDelayMs: 2000,
     public: {
       previewMode: '',
       slugDefaultLength: '6',
