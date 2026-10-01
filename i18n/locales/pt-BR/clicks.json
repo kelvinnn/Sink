@@ -1,0 +1,151 @@
+{
+  "clicks": {
+    "title": "Clicks",
+    "description": "Every visit with raw IP, network, device and source.",
+    "disabled": "The click log is off. Set NUXT_CLICK_LOG=true to start recording clicks.",
+    "range": {
+      "label": "Period",
+      "today": "Today",
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 90 days",
+      "180d": "Last 6 months"
+    },
+    "toggles": {
+      "bots": "Bots",
+      "known": "Known IPs",
+      "include": "Include",
+      "exclude": "Exclude",
+      "only": "Only"
+    },
+    "search": "Search IP, user agent, referrer, network…",
+    "export": "Export CSV",
+    "export_failed": "Export failed",
+    "filters": {
+      "active": "Filters",
+      "clear": "Clear all",
+      "remove": "Remove filter {name}"
+    },
+    "summary": {
+      "clicks": "Clicks",
+      "visitors": "Visitors",
+      "new_visitors": "New visitors",
+      "returning_clicks": "Returning clicks",
+      "ips": "Unique IPs",
+      "networks": "Networks",
+      "bots": "Bot clicks",
+      "known": "Known-IP clicks"
+    },
+    "heatmap": {
+      "title": "When people click",
+      "description": "Clicks by weekday and hour, in your timezone.",
+      "tooltip": "{day} {hour}:00 · {clicks} clicks · {visitors} visitors"
+    },
+    "weekdays": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "breakdown": {
+      "title": "Breakdown",
+      "description": "Click a row to filter by it.",
+      "value": "Value",
+      "clicks": "Clicks",
+      "visitors": "Visitors",
+      "ips": "IPs",
+      "empty": "No data for this period.",
+      "none": "(none)"
+    },
+    "dimensions": {
+      "slug": "Link",
+      "tags": "Tags",
+      "asOrg": "Network / ISP",
+      "networkType": "Network type",
+      "country": "Country",
+      "city": "City",
+      "postalCode": "Postal code",
+      "deviceType": "Device",
+      "os": "OS",
+      "browser": "Browser",
+      "inApp": "In-app",
+      "source": "Source",
+      "refererHost": "Referrer",
+      "served": "Served as",
+      "ip": "IP",
+      "visitorId": "Visitor",
+      "knownIpLabel": "Known IP",
+      "botReason": "Bot reason",
+      "language": "Language",
+      "hour": "Hour",
+      "weekday": "Weekday",
+      "day": "Day"
+    },
+    "table": {
+      "title": "Click log",
+      "time": "Time",
+      "link": "Link",
+      "ip": "IP",
+      "network": "Network",
+      "location": "Location",
+      "device": "Device",
+      "source": "Source",
+      "visitor": "Visitor",
+      "flags": "Flags",
+      "new": "New",
+      "returning": "Returning",
+      "bot": "Bot",
+      "empty": "No clicks match these filters.",
+      "load_more": "Load more",
+      "loading": "Loading…",
+      "error": "Could not load clicks."
+    }
+  },
+  "known_ips": {
+    "title": "Known IPs",
+    "description": "Label IP addresses or ranges (outlet Wi-Fi, office, agency…). Excluded IPs are hidden from click stats by default.",
+    "add": "Add IP / range",
+    "apply": "Re-apply to past clicks",
+    "applied": "Labels updated: {excluded} clicks now excluded.",
+    "apply_failed": "Could not re-apply labels",
+    "created": "Known IP added",
+    "create_failed": "Could not add the IP",
+    "deleted": "Known IP removed",
+    "empty": "No known IPs yet.",
+    "table": {
+      "cidr": "IP / range",
+      "label": "Label",
+      "category": "Category",
+      "exclude": "Excluded",
+      "note": "Note",
+      "actions": "Actions",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "form": {
+      "cidr": "IP address or CIDR range",
+      "cidr_hint": "e.g. 203.0.113.7 or 203.0.113.0/24. IPv6 prefixes in multiples of 4.",
+      "label": "Label",
+      "category": "Category",
+      "exclude": "Exclude from click stats",
+      "exclude_hint": "Hidden unless you choose Known IPs → Include/Only.",
+      "note": "Note"
+    },
+    "categories": {
+      "outlet": "Outlet",
+      "office": "Office",
+      "staff": "Staff",
+      "agency": "Agency",
+      "partner": "Partner",
+      "suspicious": "Suspicious",
+      "other": "Other"
+    },
+    "delete": {
+      "title": "Remove {cidr}?",
+      "description": "Future clicks from this range will no longer be labelled. Re-apply to update past clicks."
+    }
+  }
+}

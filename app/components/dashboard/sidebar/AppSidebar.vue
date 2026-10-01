@@ -29,6 +29,12 @@ const platformItems = computed<NavItem[]>(() => [
     isActive: isActive('realtime'),
   },
   {
+    title: 'nav.clicks',
+    url: '/dashboard/clicks',
+    icon: DASHBOARD_ROUTES.clicks.icon,
+    isActive: isActive('clicks'),
+  },
+  {
     title: 'nav.check',
     url: '/dashboard/check',
     icon: DASHBOARD_ROUTES.check.icon,
@@ -37,6 +43,12 @@ const platformItems = computed<NavItem[]>(() => [
 ])
 
 const settingsItems = computed<NavItem[]>(() => [
+  {
+    title: 'nav.known_ips',
+    url: '/dashboard/known-ips',
+    icon: DASHBOARD_ROUTES.knownIps.icon,
+    isActive: isActive('knownIps'),
+  },
   {
     title: 'nav.migrate',
     url: '/dashboard/migrate',

@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import { Activity, ChartArea, FolderSync, Link, ScanSearch } from '@lucide/vue'
+import { Activity, ChartArea, FolderSync, Link, MousePointerClick, ScanSearch, ShieldCheck } from '@lucide/vue'
 import { computed } from 'vue'
 import { useRoute } from '#imports'
 
@@ -29,6 +29,16 @@ export const DASHBOARD_ROUTES = {
     paths: ['/dashboard/realtime'],
     titleKey: 'nav.realtime',
     icon: Activity,
+  },
+  clicks: {
+    paths: ['/dashboard/clicks'],
+    titleKey: 'nav.clicks',
+    icon: MousePointerClick,
+  },
+  knownIps: {
+    paths: ['/dashboard/known-ips'],
+    titleKey: 'nav.known_ips',
+    icon: ShieldCheck,
   },
   check: {
     paths: ['/dashboard/check'],

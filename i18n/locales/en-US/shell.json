@@ -29,7 +29,9 @@
     "analysis": "Analysis",
     "realtime": "Realtime",
     "check": "Check",
-    "migrate": "Import/Export"
+    "migrate": "Import/Export",
+    "clicks": "Clicks",
+    "known_ips": "Known IPs"
   },
   "sidebar": {
     "subtitle": "Link Shortener",

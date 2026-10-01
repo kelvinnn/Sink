@@ -49,8 +49,11 @@ export function clickConditions(filter: ClickFilter, overrides: Partial<Pick<Cli
   }
   if (filter.tag)
     conditions.push(sql`(',' || coalesce(${clicks.tags}, '') || ',') like ${`%,${escapeLike(filter.tag)},%`} escape '\\'`)
-  if (filter.botReason)
-    conditions.push(sql`(',' || coalesce(${clicks.botReason}, '') || ',') like ${`%,${escapeLike(filter.botReason)},%`} escape '\\'`)
+  if (filter.botReason) {
+    conditions.push(filter.botReason === '(none)'
+      ? sql`${clicks.botReason} is null`
+      : or(eq(clicks.botReason, filter.botReason), sql`(',' || coalesce(${clicks.botReason}, '') || ',') like ${`%,${escapeLike(filter.botReason)},%`} escape '\\'`))
+  }
   if (filter.ip) {
     conditions.push(filter.ip.endsWith('*')
       ? sql`${clicks.ip} like ${`${escapeLike(filter.ip.slice(0, -1))}%`} escape '\\'`

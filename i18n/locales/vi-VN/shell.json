@@ -29,7 +29,9 @@
     "analysis": "Phân tích",
     "realtime": "Thời gian thực",
     "check": "Check",
-    "migrate": "Nhập/Xuất"
+    "migrate": "Nhập/Xuất",
+    "clicks": "Clicks",
+    "known_ips": "Known IPs"
   },
   "sidebar": {
     "subtitle": "Rút gọn liên kết",

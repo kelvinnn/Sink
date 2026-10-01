@@ -29,7 +29,9 @@
     "analysis": "Análise",
     "realtime": "Tempo Real",
     "check": "Check",
-    "migrate": "Importar/Exportar"
+    "migrate": "Importar/Exportar",
+    "clicks": "Clicks",
+    "known_ips": "Known IPs"
   },
   "sidebar": {
     "subtitle": "Encurtador de links",
