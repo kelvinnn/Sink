@@ -43,6 +43,13 @@
       "when": 1789995773114,
       "tag": "0005_tan_karma",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1790826240912,
+      "tag": "0006_clean_kulan_gath",
+      "breakpoints": true
     }
   ]
 }

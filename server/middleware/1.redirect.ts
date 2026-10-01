@@ -1,3 +1,4 @@
+import type { ServeMode } from '../utils/click-log'
 import type { Link } from '@/types'
 import { parsePath, withQuery } from 'ufo'
 import { proxyLinkRequest } from '../services/link-proxy'
@@ -192,8 +193,17 @@ export default eventHandler(async (event) => {
         }
       }
 
+      // Fork: per-click log. Mirrors the branch order below to record how the click was served.
+      const servesTrackingPage = shouldServeTrackingPage(event, link)
+      const servedAs: ServeMode = deviceRedirectUrl
+        ? (servesTrackingPage ? 'gtm' : 'redirect')
+        : isSocialBot(userAgent) && hasOgConfig(link)
+          ? 'preview'
+          : isProxyLink ? 'proxy' : link.cloaking ? 'cloak' : servesTrackingPage ? 'gtm' : 'redirect'
+      logClick(event, link, finalTargetUrl, servedAs)
+
       if (deviceRedirectUrl) {
-        if (shouldServeTrackingPage(event, link))
+        if (servesTrackingPage)
           return sendNoStoreHtml(generateTrackingHtml(event, link, finalTargetUrl))
         if (redirectNoStore)
           setHeader(event, 'Cache-Control', 'no-store')
@@ -222,7 +232,7 @@ export default eventHandler(async (event) => {
         return html
       }
 
-      if (shouldServeTrackingPage(event, link))
+      if (servesTrackingPage)
         return sendNoStoreHtml(generateTrackingHtml(event, link, finalTargetUrl))
 
       if (redirectNoStore)

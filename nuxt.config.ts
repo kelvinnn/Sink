@@ -43,6 +43,11 @@ export default defineNuxtConfig({
     gtmId: '',
     gtmSkipTags: 'internal,hiring',
     gtmMaxDelayMs: 2000,
+    // Fork: per-click log in D1 (raw IP, UA, referrer, ...) and first-party visitor cookie.
+    clickLog: false,
+    clickLogRetentionDays: 183,
+    visitorCookie: '_v',
+    visitorCookieEnabled: true,
     public: {
       previewMode: '',
       slugDefaultLength: '6',

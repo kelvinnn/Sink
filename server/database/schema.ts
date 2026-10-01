@@ -1,6 +1,6 @@
 import type { Link } from '../../shared/schemas/link'
 import { sql } from 'drizzle-orm'
-import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { index, integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const links = sqliteTable('links', {
   slug: text().primaryKey(),
@@ -66,3 +66,69 @@ export const linkMigrationRuns = sqliteTable('link_migration_runs', {
     sql`${table.id} desc`,
   ),
 ])
+
+// Fork: per-click log (NUXT_CLICK_LOG=true). One row per short-link visit, raw values.
+export const clicks = sqliteTable('clicks', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  ts: integer().notNull(), // unix milliseconds
+  linkId: text('link_id'),
+  slug: text().notNull(),
+  tags: text(), // comma-separated link tags at click time
+  destination: text(),
+  served: text(), // gtm | redirect | preview | proxy | cloak
+  ip: text(),
+  ipV4: integer('ip_v4'), // IPv4 as an unsigned integer, for range matching
+  ipV6: text('ip_v6'), // IPv6 expanded to 32 hex chars, for prefix matching
+  asn: integer(),
+  asOrg: text('as_org'),
+  networkType: text('network_type'), // isp | datacenter | relay
+  country: text(),
+  region: text(),
+  city: text(),
+  postalCode: text('postal_code'),
+  latitude: real(),
+  longitude: real(),
+  timezone: text(),
+  colo: text(),
+  ua: text(),
+  browser: text(),
+  browserVersion: text('browser_version'),
+  os: text(),
+  osVersion: text('os_version'),
+  deviceType: text('device_type'), // mobile | tablet | desktop | ...
+  deviceVendor: text('device_vendor'),
+  deviceModel: text('device_model'),
+  inApp: text('in_app'), // instagram | facebook | tiktok | ...
+  language: text(),
+  referer: text(),
+  refererHost: text('referer_host'),
+  query: text(), // raw incoming query string
+  source: text(), // ?s= or utm_source
+  visitorId: text('visitor_id'),
+  newVisitor: integer('new_visitor', { mode: 'boolean' }),
+  isBot: integer('is_bot', { mode: 'boolean' }).notNull().default(false),
+  botReason: text('bot_reason'),
+  knownIpId: integer('known_ip_id'),
+  knownIpLabel: text('known_ip_label'),
+  knownIpExclude: integer('known_ip_exclude', { mode: 'boolean' }).notNull().default(false),
+}, table => [
+  index('clicks_ts_idx').on(table.ts),
+  index('clicks_slug_ts_idx').on(table.slug, table.ts),
+  index('clicks_ip_idx').on(table.ip),
+  index('clicks_ip_v4_idx').on(table.ipV4),
+  index('clicks_visitor_id_idx').on(table.visitorId),
+])
+
+// Fork: labelled IPs / ranges (outlets, office, agency, ...). Matched when clicks are written.
+export const knownIps = sqliteTable('known_ips', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  cidr: text().notNull().unique(), // e.g. 203.0.113.7/32, 203.0.113.0/24, 2001:db8:1::/48
+  label: text().notNull(),
+  category: text().notNull().default('other'),
+  exclude: integer({ mode: 'boolean' }).notNull().default(true),
+  note: text(),
+  v4Start: integer('v4_start'),
+  v4End: integer('v4_end'),
+  v6Prefix: text('v6_prefix'), // leading hex nibbles of the expanded address
+  createdAt: integer('created_at').notNull(),
+})
