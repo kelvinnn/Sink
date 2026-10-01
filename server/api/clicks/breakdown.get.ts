@@ -11,6 +11,7 @@ defineRouteMeta({
 
 export default eventHandler(async (event) => {
   const query = await getValidatedQuery(event, ClickBreakdownQuerySchema.parse)
+  const admin = assertClickAccess(event, query, query.dimension)
   const value = dimensionExpression(query.dimension, query.tzOffset)
   const count = sql<number>`count(*)`
   const isTime = ['hour', 'weekday', 'day'].includes(query.dimension)
@@ -20,6 +21,6 @@ export default eventHandler(async (event) => {
     visitors: sql<number>`count(distinct ${clicks.visitorId})`,
     ips: sql<number>`count(distinct ${clicks.ip})`,
     lastSeen: sql<number>`max(${clicks.ts})`,
-  }).from(clicks).where(clickConditions(query)).groupBy(value).orderBy(isTime ? value : desc(count)).limit(query.limit)
+  }).from(clicks).where(clickConditions(query, { searchIp: admin })).groupBy(value).orderBy(isTime ? value : desc(count)).limit(query.limit)
   return { dimension: query.dimension, data: rows }
 })

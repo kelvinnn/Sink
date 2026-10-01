@@ -132,3 +132,48 @@ export const knownIps = sqliteTable('known_ips', {
   v6Prefix: text('v6_prefix'), // leading hex nibbles of the expanded address
   createdAt: integer('created_at').notNull(),
 })
+
+// Fork: dashboard users seen through Cloudflare Access, with a role.
+export const users = sqliteTable('users', {
+  email: text().primaryKey(), // lowercased
+  role: text({ enum: ['admin', 'editor', 'viewer'] }).notNull().default('editor'),
+  disabled: integer({ mode: 'boolean' }).notNull().default(false),
+  createdAt: integer('created_at').notNull(),
+  lastSeenAt: integer('last_seen_at'),
+  updatedBy: text('updated_by'),
+})
+
+// Fork: append-only activity log. Link rows carry full before/after snapshots, which is what
+// makes deleted links restorable and any version revertable.
+export const activity = sqliteTable('activity', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  ts: integer().notNull(), // unix milliseconds
+  actorEmail: text('actor_email').notNull(),
+  actorRole: text('actor_role').notNull(),
+  authMethod: text('auth_method').notNull(), // site-token | access-user | access-service
+  ip: text(),
+  action: text().notNull(), // link.create | link.update | link.delete | link.restore | ...
+  targetType: text('target_type').notNull(), // link | known_ip | user | clicks | links | system
+  targetId: text('target_id'), // link id, known-ip id, user email
+  targetLabel: text('target_label'), // slug, cidr, ...
+  before: text({ mode: 'json' }).$type<Record<string, unknown> | null>(),
+  after: text({ mode: 'json' }).$type<Record<string, unknown> | null>(),
+  note: text(),
+}, table => [
+  index('activity_ts_idx').on(table.ts),
+  index('activity_target_idx').on(table.targetType, table.targetId, table.ts),
+  index('activity_label_idx').on(table.targetType, table.targetLabel, table.ts),
+  index('activity_actor_idx').on(table.actorEmail, table.ts),
+])
+
+// Fork: link locks. A locked link can only be changed or deleted by an admin.
+export const linkLocks = sqliteTable('link_locks', {
+  linkId: text('link_id').primaryKey(),
+  slug: text().notNull(),
+  lockedBy: text('locked_by').notNull(),
+  lockedAt: integer('locked_at').notNull(), // unix seconds
+  expiresAt: integer('expires_at'), // unix seconds; null = until unlocked
+  reason: text(),
+}, table => [
+  index('link_locks_slug_idx').on(table.slug),
+])

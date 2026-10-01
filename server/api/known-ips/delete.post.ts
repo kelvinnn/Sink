@@ -11,7 +11,9 @@ defineRouteMeta({
 
 export default eventHandler(async (event) => {
   const { id } = await readValidatedBody(event, DeleteKnownIpSchema.parse)
-  await useClickDb(event).delete(knownIps).where(eq(knownIps.id, id))
+  const [removed] = await useClickDb(event).delete(knownIps).where(eq(knownIps.id, id)).returning()
+  if (removed)
+    await recordActivitySafe(event, { action: 'known_ip.delete', targetType: 'known_ip', targetId: String(removed.id), targetLabel: removed.cidr, before: { label: removed.label, category: removed.category, exclude: removed.exclude, note: removed.note } })
   invalidateKnownIpCache()
   return { ok: true }
 })

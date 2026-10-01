@@ -29,6 +29,7 @@ export default eventHandler(async (event) => {
     createdAt: Math.floor(Date.now() / 1000),
   }).returning()
   invalidateKnownIpCache()
+  await recordActivitySafe(event, { action: 'known_ip.create', targetType: 'known_ip', targetId: String(row!.id), targetLabel: row!.cidr, after: { label: row!.label, category: row!.category, exclude: row!.exclude, note: row!.note } })
   setResponseStatus(event, 201)
   return { knownIp: row }
 })

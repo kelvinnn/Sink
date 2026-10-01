@@ -26,6 +26,7 @@ export default eventHandler(async (event) => {
       break
     offset += rows.length
   }
+  await recordActivitySafe(event, { action: 'clicks.export', targetType: 'clicks', targetLabel: `${lines.length - 1} rows`, note: JSON.stringify(Object.fromEntries(Object.entries(query).filter(([, value]) => value !== undefined))) })
   setHeader(event, 'Content-Type', 'text/csv; charset=utf-8')
   setHeader(event, 'Content-Disposition', `attachment; filename="clicks-${new Date().toISOString().slice(0, 10)}.csv"`)
   setHeader(event, 'Cache-Control', 'no-store')

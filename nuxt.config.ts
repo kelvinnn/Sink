@@ -48,6 +48,10 @@ export default defineNuxtConfig({
     clickLogRetentionDays: 183,
     visitorCookie: '_v',
     visitorCookieEnabled: true,
+    // Fork: roles for Cloudflare Access users. Site token and service tokens are always admin.
+    adminEmails: '',
+    defaultRole: 'editor',
+    allowedEmailDomains: '',
     public: {
       previewMode: '',
       slugDefaultLength: '6',

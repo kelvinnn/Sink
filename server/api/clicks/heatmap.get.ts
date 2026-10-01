@@ -11,6 +11,7 @@ defineRouteMeta({
 
 export default eventHandler(async (event) => {
   const filter = await getValidatedQuery(event, ClickFilterSchema.parse)
+  const admin = assertClickAccess(event, filter)
   const weekday = dimensionExpression('weekday', filter.tzOffset)
   const hour = dimensionExpression('hour', filter.tzOffset)
   const rows = await useClickDb(event).select({
@@ -18,6 +19,6 @@ export default eventHandler(async (event) => {
     hour: sql<number>`${hour}`,
     clicks: sql<number>`count(*)`,
     visitors: sql<number>`count(distinct ${clicks.visitorId})`,
-  }).from(clicks).where(clickConditions(filter)).groupBy(weekday, hour)
+  }).from(clicks).where(clickConditions(filter, { searchIp: admin })).groupBy(weekday, hour)
   return { data: rows }
 })

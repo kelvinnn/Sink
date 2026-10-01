@@ -34,7 +34,20 @@ function escapeLike(value: string) {
   return value.replace(/[\\%_]/g, char => `\\${char}`)
 }
 
-export function clickConditions(filter: ClickFilter, overrides: Partial<Pick<ClickFilter, 'bots' | 'known'>> = {}): SQL | undefined {
+/** Non-admins may not filter or group by IP or visitor id. */
+export function assertClickAccess(event: H3Event, filter: ClickFilter, dimension?: ClickDimension): boolean {
+  const admin = isAdmin(event)
+  if (!admin && (filter.ip || filter.visitorId || dimension === 'ip' || dimension === 'visitorId'))
+    throw createError({ status: 403, statusText: 'IP and visitor details require the admin role' })
+  return admin
+}
+
+/** Removes personal identifiers from a click row for non-admin roles. */
+export function redactClick<T extends Record<string, unknown>>(row: T): T {
+  return { ...row, ip: null, ipV4: null, ipV6: null, visitorId: row.visitorId ? 'hidden' : null, latitude: null, longitude: null }
+}
+
+export function clickConditions(filter: ClickFilter, overrides: Partial<Pick<ClickFilter, 'bots' | 'known'>> & { searchIp?: boolean } = {}): SQL | undefined {
   const conditions: (SQL | undefined)[] = []
   if (filter.startAt !== undefined)
     conditions.push(gte(clicks.ts, filter.startAt * 1000))
@@ -62,7 +75,7 @@ export function clickConditions(filter: ClickFilter, overrides: Partial<Pick<Cli
   if (filter.q) {
     const pattern = `%${escapeLike(filter.q)}%`
     conditions.push(or(
-      sql`${clicks.ip} like ${pattern} escape '\\'`,
+      overrides.searchIp === false ? undefined : sql`${clicks.ip} like ${pattern} escape '\\'`,
       sql`${clicks.ua} like ${pattern} escape '\\'`,
       sql`${clicks.referer} like ${pattern} escape '\\'`,
       sql`${clicks.asOrg} like ${pattern} escape '\\'`,

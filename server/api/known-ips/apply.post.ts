@@ -27,5 +27,6 @@ export default eventHandler(async (event) => {
   }
   const [{ total } = { total: 0 }] = await db.select({ total: sql<number>`count(*)` }).from(clicks).where(eq(clicks.knownIpExclude, true))
   invalidateKnownIpCache()
+  await recordActivitySafe(event, { action: 'known_ip.apply', targetType: 'known_ip', targetLabel: `${ranges.length} ranges`, note: `${total} clicks excluded` })
   return { ranges: ranges.length, updates: labelled, excludedClicks: total }
 })
