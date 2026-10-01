@@ -83,6 +83,7 @@ Set `NUXT_ADMIN_HOST` (for example `admin.example.com`, behind Cloudflare Access
 | `NUXT_CLICK_LOG_RETENTION_DAYS` | `183` | Delete click rows older than this (daily) |
 | `NUXT_VISITOR_COOKIE` / `NUXT_VISITOR_COOKIE_ENABLED` | `_v` / `true` | First-party visitor cookie |
 | `NUXT_ADMIN_HOST` | *(empty)* | Hostname that serves the dashboard (put it behind Cloudflare Access). Other hostnames only redirect |
+| `NUXT_SHORT_LINK_ORIGIN` | *(empty)* | Public origin of your short links when the dashboard is on another hostname (display, copy, QR, API) |
 | `NUXT_ADMIN_EMAILS` | *(empty)* | Comma-separated emails that are always admin |
 | `NUXT_DEFAULT_ROLE` | `editor` | Role for new Access users: `admin`, `editor` or `viewer` |
 | `NUXT_ALLOWED_EMAIL_DOMAINS` | *(empty)* | Optional extra check on top of the Access policy |

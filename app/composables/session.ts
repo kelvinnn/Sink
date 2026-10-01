@@ -8,6 +8,7 @@ export interface DashboardSession {
   authMethod: string
   can: { edit: boolean, admin: boolean, seeIps: boolean }
   clickLog: boolean
+  shortLinkOrigin: string | null
 }
 
 export function useDashboardSession() {
@@ -30,4 +31,20 @@ export function useDashboardSession() {
   const canSeeIps = computed(() => session.value?.can.seeIps ?? false)
 
   return { session, load, isAdmin, canEdit, canSeeIps }
+}
+
+/** Origin and host used to show, copy and encode short links (may differ from the dashboard's own host). */
+export function useShortLinkBase() {
+  const { session } = useDashboardSession()
+  const requestUrl = useRequestURL()
+  const origin = computed(() => session.value?.shortLinkOrigin || requestUrl.origin)
+  const host = computed(() => {
+    try {
+      return new URL(origin.value).host
+    }
+    catch {
+      return requestUrl.host
+    }
+  })
+  return { origin, host }
 }

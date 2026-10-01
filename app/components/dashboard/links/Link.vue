@@ -91,16 +91,14 @@ const counterErrorIds = inject(LINKS_COUNTER_ERROR_IDS_KEY)
 const retryCounters = inject(RETRY_LINK_COUNTERS_KEY)
 const countersError = computed(() => counterErrorIds?.value.has(props.link.id) ?? false)
 
-const requestUrl = useRequestURL()
-const host = requestUrl.host
-const origin = requestUrl.origin
+const { origin, host } = useShortLinkBase() // Fork: short links may live on another hostname than the dashboard
 
 function getLinkHost(url: string): string | undefined {
   const { host } = parseURL(url)
   return host
 }
 
-const shortLink = computed(() => `${origin}/${props.link.slug}`)
+const shortLink = computed(() => `${origin.value}/${props.link.slug}`)
 const linkIcon = computed(() => `https://unavatar.webp.se/${getLinkHost(props.link.url)}?fallback=https://sink.cool/icon.png`)
 const isExpired = computed(() => Boolean(props.link.expiration && props.link.expiration <= Math.floor(Date.now() / 1000)))
 const noteText = computed(() => props.link.comment?.trim() ?? '')

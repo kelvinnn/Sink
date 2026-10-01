@@ -155,6 +155,22 @@ describe('activity, restore and revert', () => {
   })
 })
 
+describe('short link origin', () => {
+  it('uses NUXT_SHORT_LINK_ORIGIN for API short links and exposes it in the session', async () => {
+    env.NUXT_SHORT_LINK_ORIGIN = 'https://short.example.com/'
+    try {
+      const slug = newSlug('origin')
+      const created = await (await as(EDITOR, '/api/link/create', { method: 'POST', body: { url: 'https://example.com/origin', slug } })).json() as { shortLink: string }
+      expect(created.shortLink).toBe(`https://short.example.com/${slug}`)
+      expect(await (await as(EDITOR, '/api/session')).json()).toMatchObject({ shortLinkOrigin: 'https://short.example.com' })
+    }
+    finally {
+      env.NUXT_SHORT_LINK_ORIGIN = ''
+    }
+    expect(await (await as(EDITOR, '/api/session')).json()).toMatchObject({ shortLinkOrigin: null })
+  })
+})
+
 describe('link locks', () => {
   it('blocks editors on locked links, with optional expiry', async () => {
     const slug = newSlug('lock')

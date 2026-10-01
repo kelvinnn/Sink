@@ -21,7 +21,7 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 const linksSearchStore = useDashboardLinksSearchStore()
-const requestUrl = useRequestURL()
+const { origin: shortLinkOrigin } = useShortLinkBase() // Fork
 
 const slugValidator = SlugSchema
 const commentValidator = z.string().max(500).optional()
@@ -159,7 +159,7 @@ watch(currentUrl, (url) => {
   void findDuplicateLink(url, generation)
 }, { immediate: true })
 
-const shortDuplicateLink = computed(() => duplicateLink.value ? `${requestUrl.origin}/${duplicateLink.value.slug}` : '')
+const shortDuplicateLink = computed(() => duplicateLink.value ? `${shortLinkOrigin.value}/${duplicateLink.value.slug}` : '')
 
 const { previewMode } = useRuntimeConfig().public
 const isExpiredLink = computed(() => Boolean(

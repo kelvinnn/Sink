@@ -28,7 +28,9 @@ export function normalizeSlug(event: H3Event, slug: string): string {
 }
 
 export function buildShortLink(event: H3Event, slug: string): string {
-  return `${getRequestProtocol(event)}://${getRequestHost(event)}/${slug}`
+  // Fork: the dashboard may live on a separate admin hostname.
+  const origin = String(useRuntimeConfig(event).shortLinkOrigin || '').trim().replace(/\/+$/, '')
+  return `${origin || `${getRequestProtocol(event)}://${getRequestHost(event)}`}/${slug}`
 }
 
 async function writeThroughCache(event: H3Event, link: Link, effectiveExpiresAt?: number | null): Promise<void> {

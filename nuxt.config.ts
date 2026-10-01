@@ -49,6 +49,9 @@ export default defineNuxtConfig({
     visitorCookie: '_v',
     visitorCookieEnabled: true,
     // Fork: roles for Cloudflare Access users. Site token and service tokens are always admin.
+    // Fork: public origin of short links (e.g. https://example.com) when the dashboard is on
+    // another hostname. Empty = the hostname the dashboard is opened on.
+    shortLinkOrigin: '',
     adminEmails: '',
     defaultRole: 'editor',
     allowedEmailDomains: '',

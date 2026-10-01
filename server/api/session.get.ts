@@ -17,5 +17,6 @@ export default eventHandler((event) => {
       seeIps: actor.role === 'admin',
     },
     clickLog: !!useRuntimeConfig(event).clickLog,
+    shortLinkOrigin: String(useRuntimeConfig(event).shortLinkOrigin || '').trim().replace(/\/+$/, '') || null,
   }
 })
