@@ -2,6 +2,8 @@
 definePageMeta({
   layout: 'dashboard',
 })
+
+useDashboardClicksRouteState()
 </script>
 
 <template>

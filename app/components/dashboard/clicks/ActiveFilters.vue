@@ -11,6 +11,11 @@ const applySearch = useDebounceFn((value: string) => {
 }, 400)
 
 watch(search, value => applySearch(value))
+// Keep the box in sync when filters change from the URL or "Clear all".
+watch(() => store.filters.q, (value) => {
+  if ((value ?? '') !== search.value.trim())
+    search.value = value ?? ''
+})
 
 const chips = computed(() => Object.entries(store.filters)
   .filter(([key]) => key !== 'q')

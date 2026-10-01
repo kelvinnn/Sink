@@ -1,5 +1,6 @@
 import type { ClickDimension } from '#shared/schemas/click'
 import { defineStore } from 'pinia'
+import { CLICK_DIMENSIONS } from '#shared/schemas/click'
 
 // Fork: state for the Clicks dashboard page.
 
@@ -104,3 +105,56 @@ export const useDashboardClicksStore = defineStore('dashboard-clicks', () => {
 
   return { preset, filters, bots, known, tzOffset, query, setFilter, clearFilters, refresh }
 })
+
+const ROUTE_FILTER_KEYS = [...CLICK_DIMENSIONS.filter(key => !['hour', 'weekday', 'day'].includes(key)), 'q'] as const
+const PRESETS: ClickRangePreset[] = ['today', '7d', '30d', '90d', '180d']
+const TRI_STATES: ClickTriState[] = ['include', 'exclude', 'only']
+
+/** Keeps the Clicks page filters in the URL (e.g. /dashboard/clicks?slug=menu.pdf), both ways. */
+export function useDashboardClicksRouteState() {
+  const route = useRoute()
+  const router = useRouter()
+  const store = useDashboardClicksStore()
+
+  function fromRoute() {
+    const query = route.query
+    const pick = (key: string) => (typeof query[key] === 'string' && query[key] ? query[key] as string : undefined)
+    const filters: Partial<Record<ClickDimension | 'q', string>> = {}
+    for (const key of ROUTE_FILTER_KEYS) {
+      const value = pick(key)
+      if (value)
+        filters[key] = value
+    }
+    store.filters = filters
+    const preset = pick('period') as ClickRangePreset | undefined
+    store.preset = preset && PRESETS.includes(preset) ? preset : '7d'
+    const bots = pick('bots') as ClickTriState | undefined
+    store.bots = bots && TRI_STATES.includes(bots) ? bots : 'exclude'
+    const known = pick('known') as ClickTriState | undefined
+    store.known = known && TRI_STATES.includes(known) ? known : 'exclude'
+  }
+
+  function toQuery() {
+    return {
+      ...store.filters,
+      period: store.preset === '7d' ? undefined : store.preset,
+      bots: store.bots === 'exclude' ? undefined : store.bots,
+      known: store.known === 'exclude' ? undefined : store.known,
+    }
+  }
+
+  const serialize = (query: Record<string, unknown>) => JSON.stringify(Object.entries(query).filter(([, value]) => value !== undefined && value !== null && value !== '').sort())
+
+  fromRoute()
+
+  watch(() => route.query, (query) => {
+    if (serialize(query) !== serialize(toQuery()))
+      fromRoute()
+  })
+
+  watch(() => [store.filters, store.preset, store.bots, store.known], () => {
+    const next = toQuery()
+    if (serialize(next) !== serialize(route.query))
+      void router.push({ query: next })
+  }, { deep: true })
+}

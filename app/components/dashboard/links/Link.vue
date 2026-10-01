@@ -270,6 +270,14 @@ function copyLink() {
                 {{ $t('common.edit') }}
               </DropdownMenuItem>
 
+              <!-- Fork: open the click log filtered to this link -->
+              <DropdownMenuItem as-child>
+                <NuxtLink :to="{ path: '/dashboard/clicks', query: { slug: link.slug } }">
+                  <MousePointerClick aria-hidden="true" />
+                  {{ $t('nav.clicks') }}
+                </NuxtLink>
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
