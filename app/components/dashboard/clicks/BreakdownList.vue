@@ -60,13 +60,13 @@ function select(value: ClickBreakdownRow['value']) {
       <TableHeader>
         <TableRow>
           <TableHead>{{ $t('clicks.breakdown.value') }}</TableHead>
-          <TableHead class="w-20 text-right">
+          <TableHead class="w-16 text-right">
             {{ $t('clicks.breakdown.clicks') }}
           </TableHead>
-          <TableHead class="w-20 text-right">
+          <TableHead class="w-16 text-right">
             {{ $t('clicks.breakdown.visitors') }}
           </TableHead>
-          <TableHead class="w-16 text-right">
+          <TableHead class="w-12 text-right">
             {{ $t('clicks.breakdown.ips') }}
           </TableHead>
         </TableRow>

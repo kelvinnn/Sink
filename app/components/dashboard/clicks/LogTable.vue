@@ -72,7 +72,7 @@ function location(row: ClickRow) {
               <TableHead class="w-36">
                 {{ $t('clicks.table.link') }}
               </TableHead>
-              <TableHead class="w-36">
+              <TableHead class="w-44">
                 {{ $t('clicks.table.ip') }}
               </TableHead>
               <TableHead class="w-48">
@@ -116,9 +116,9 @@ function location(row: ClickRow) {
               <TableCell class="font-mono">
                 <button
                   type="button" class="
-                    truncate text-left
+                    block w-full truncate text-left
                     hover:underline
-                  " @click="filterBy('ip', row.ip)"
+                  " :title="row.ip || ''" @click="filterBy('ip', row.ip)"
                 >
                   {{ row.ip }}
                 </button>

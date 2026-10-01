@@ -12,7 +12,8 @@ const groups: ClickDimension[][] = [
   <div
     class="
       grid gap-4
-      xl:grid-cols-3
+      lg:grid-cols-2
+      2xl:grid-cols-3
     "
   >
     <Card v-for="(dimensions, index) in groups" :key="index" class="gap-2">
