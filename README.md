@@ -1,3 +1,88 @@
+<!-- FORK-README:START (this block is fork-only; the upstream README continues unchanged below) -->
+
+# ⚡ Sink — with retargeting pixels and a raw click log
+
+**A self-hosted link shortener on Cloudflare Workers that fires Google Tag Manager, Meta Pixel and Google Ads retargeting tags on every redirect, and keeps a raw, per-click log with IP address, ISP, device, source and bot detection.**
+
+> [!NOTE]
+> This is a **fork of [miantiao-me/Sink](https://github.com/miantiao-me/Sink)**, the excellent serverless link shortener. All credit for Sink itself goes to its author and contributors. This fork adds the features below, **all opt-in**: with none of the settings set, it behaves exactly like upstream. It is kept merge-compatible with upstream.
+
+## Why this fork
+
+Hosted shorteners such as Bitly, Short.io, Rebrandly and Dub typically put retargeting pixels and detailed click data on paid plans, or don't offer them at all. Sink is free to run on Cloudflare's free tier, but redirects instantly, so no browser tag can fire. This fork adds the marketing and data features while keeping everything else about Sink.
+
+| | Upstream Sink | This fork |
+|---|---|---|
+| Retargeting pixels on redirect (GTM → Meta Pixel, Google Ads, GA4, TikTok, …) | — | ✅ |
+| Raw per-click log: IP, ISP / ASN, postal-code area, device, in-app browser, referrer, source | — | ✅ |
+| New vs returning visitors (first-party cookie) | — | ✅ |
+| Bot, link-preview and email-scanner detection with reasons | Basic | ✅ |
+| Known IPs: label and exclude your own networks (shops, office, agency) | — | ✅ |
+| Clicks dashboard: filters, weekday × hour heatmap, breakdowns, CSV export | — | ✅ |
+| Slugs with `/` and `.` (`menu/lunch`, `price-list.pdf`) | — | ✅ |
+| Hidden admin: dashboard, API and assets invisible without a secret path | — | ✅ |
+| Everything in Sink: analytics, QR codes, AI slugs, geo / device routing, import / export, MCP | ✅ | ✅ |
+
+## What it adds
+
+### 🎯 Retargeting pixels on redirect
+Set `NUXT_GTM_ID` and each visit gets a tiny page that loads your Google Tag Manager container, then redirects. Run Meta Pixel, Google Ads remarketing, GA4 or any other tag from GTM, so you can build ad audiences even when the destination is a site you don't control (delivery apps, marketplaces, WhatsApp, Google Maps, forms).
+
+- Pushes a `shortlink_view` event with the slug, tags and destination host to the `dataLayer`, for per-link and per-tag audiences
+- Bots and link previewers skip the page and get a plain redirect
+- Links tagged `internal` or `hiring` (configurable) never fire pixels, so staff and job applicants stay out of your audiences
+- Cross-domain GA4 / Ads linker support (`_gl`) for your own destinations
+
+### 🧾 Raw click log
+Set `NUXT_CLICK_LOG=true` and every visit is stored as one row in your own D1 database:
+
+- **Network:** full IP (IPv4 / IPv6), ASN, ISP / organisation, network type (ISP, data centre, privacy relay, corporate proxy)
+- **Place:** country, region, city, postal code, coordinates, timezone
+- **Device:** type, vendor, model, OS, browser, and the **in-app browser** (Instagram, Facebook, TikTok, WhatsApp, WeChat, LINE, …)
+- **Source:** full referrer, raw query string, `?s=` / `utm_source`
+- **Visitor:** first-party cookie ID, new vs returning
+- **Quality:** bot flag with reasons (preview bot, data-centre network, HTTP client, headless browser)
+- Automatic retention (`NUXT_CLICK_LOG_RETENTION_DAYS`, default 183) and CSV export
+
+### 📊 Clicks dashboard
+A new **Clicks** page: period, bot and known-IP filters; search; totals; a weekday × hour heatmap; breakdowns by link, tag, source, referrer, in-app browser, network, IP, visitor, device, location and time (click any row to filter); the raw log; CSV export. Filters live in the URL, and every link has a **Clicks** shortcut.
+
+### 🛡️ Known IPs
+Label IP addresses or CIDR ranges (shop Wi-Fi, office, agency) and exclude them from stats. Labels can be re-applied to past clicks.
+
+### 🕶️ Hidden admin
+Set `NUXT_ADMIN_GATE_PATH` and the dashboard, API and static files answer like an unknown link until that secret path is visited. `robots.txt` is neutral, `workers.dev` and preview URLs are off, and the redirect page carries no branding.
+
+### 🔧 Smaller changes
+- Slugs may contain `.`, `_` and `/`
+- Stored destination URLs are never re-encoded
+- Fix for the link import form being disabled by default
+
+## Fork settings
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `NUXT_GTM_ID` | *(empty)* | GTM container to load before redirecting. Empty = plain redirects |
+| `NUXT_GTM_SKIP_TAGS` | `internal,hiring` | Link tags that never get the tracking page |
+| `NUXT_GTM_MAX_DELAY_MS` | `2000` | Longest wait before redirecting |
+| `NUXT_CLICK_LOG` | `false` | Store one row per click in D1 |
+| `NUXT_CLICK_LOG_RETENTION_DAYS` | `183` | Delete click rows older than this (daily) |
+| `NUXT_VISITOR_COOKIE` / `NUXT_VISITOR_COOKIE_ENABLED` | `_v` / `true` | First-party visitor cookie |
+| `NUXT_ADMIN_GATE_PATH` | *(empty)* | Secret path that unlocks the dashboard. Set it as a secret |
+
+Deploy exactly as upstream ([Workers guide](https://docs.sink.cool/deployment/workers)), then add the variables you want under **Worker → Settings → Variables and Secrets**. For a GTM page that behaves like classic redirects, also set `NUXT_REDIRECT_STATUS_CODE=302` and `NUXT_REDIRECT_WITH_QUERY=true`.
+
+> [!IMPORTANT]
+> Retargeting tags, IP logging and visitor cookies process personal data. Tell your visitors in your privacy notice, and check the rules that apply to you (GDPR, PDPA, CCPA, …).
+
+File-by-file changes and upstream-sync notes: **[FORK.md](./FORK.md)**. Licence: AGPL-3.0, same as upstream.
+
+<!-- FORK-README:END -->
+
+---
+
+> The original Sink README follows, unchanged.
+
 # ⚡ Sink
 
 **A Simple, Speedy, Secure, and Serverless Link Shortener with Analytics, Running Entirely on Cloudflare.**
