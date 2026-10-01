@@ -20,7 +20,11 @@ Hosted shorteners such as Bitly, Short.io, Rebrandly and Dub typically put retar
 | Known IPs: label and exclude your own networks (shops, office, agency) | — | ✅ |
 | Clicks dashboard: filters, weekday × hour heatmap, breakdowns, CSV export | — | ✅ |
 | Slugs with `/` and `.` (`menu/lunch`, `price-list.pdf`) | — | ✅ |
-| Hidden admin: dashboard, API and assets invisible without a secret path | — | ✅ |
+| Team access: Cloudflare Access sign-in with admin / editor / viewer roles | Single shared admin | ✅ |
+| Activity log: who created, changed or deleted what, and when | — | ✅ |
+| Restore deleted links and revert to any earlier version | — | ✅ |
+| Link locks (optionally until a date) for links on printed materials | — | ✅ |
+| Hidden admin: dashboard, API and assets invisible on your public short domain | — | ✅ |
 | Everything in Sink: analytics, QR codes, AI slugs, geo / device routing, import / export, MCP | ✅ | ✅ |
 
 ## What it adds
@@ -50,8 +54,18 @@ A new **Clicks** page: period, bot and known-IP filters; search; totals; a weekd
 ### 🛡️ Known IPs
 Label IP addresses or CIDR ranges (shop Wi-Fi, office, agency) and exclude them from stats. Labels can be re-applied to past clicks.
 
+### 👥 Team access, roles and an audit trail
+Put the dashboard behind [Cloudflare Access](https://docs.sink.cool/configuration/cloudflare-access) and each person signs in as themselves (Google, one-time email code, SSO).
+
+- **Roles:** *admin* (everything), *editor* (create, edit, delete and restore links; statistics without IPs) and *viewer* (read-only). New users get `NUXT_DEFAULT_ROLE`; emails in `NUXT_ADMIN_EMAILS` are always admin. A **Users** page changes roles or disables people.
+- **Activity log:** every create, edit, delete, import, restore, revert, lock, role change and data export is recorded with who, when, from which IP and a before / after snapshot. Entries are append-only.
+- **Soft delete and history:** deleting a link saves its full version first. A **Deleted links** page restores it with the same id, so its statistics continue. Each link has a **History** with field-level changes and *Return to this version*.
+- **Created by / edited by** on every link card.
+- **Link locks:** an admin can lock a link, until unlocked or until a date, with a reason. Editors cannot change or delete a locked link. Made for links printed on menus, packaging and signage.
+- **Privacy by role:** raw IPs, visitor ids and CSV export are admin-only.
+
 ### 🕶️ Hidden admin
-Set `NUXT_ADMIN_GATE_PATH` and the dashboard, API and static files answer like an unknown link until that secret path is visited. `robots.txt` is neutral, `workers.dev` and preview URLs are off, and the redirect page carries no branding.
+Set `NUXT_ADMIN_HOST` (for example `admin.example.com`, behind Cloudflare Access) and the dashboard, API and static files are served only there. Your public short domain answers every other path like an unknown link. Alternatively, `NUXT_ADMIN_GATE_PATH` unlocks the dashboard through a secret path. Either way `robots.txt` is neutral, `workers.dev` and preview URLs are off, and the redirect page carries no branding.
 
 ### 🔧 Smaller changes
 - Slugs may contain `.`, `_` and `/`
@@ -68,7 +82,11 @@ Set `NUXT_ADMIN_GATE_PATH` and the dashboard, API and static files answer like a
 | `NUXT_CLICK_LOG` | `false` | Store one row per click in D1 |
 | `NUXT_CLICK_LOG_RETENTION_DAYS` | `183` | Delete click rows older than this (daily) |
 | `NUXT_VISITOR_COOKIE` / `NUXT_VISITOR_COOKIE_ENABLED` | `_v` / `true` | First-party visitor cookie |
-| `NUXT_ADMIN_GATE_PATH` | *(empty)* | Secret path that unlocks the dashboard. Set it as a secret |
+| `NUXT_ADMIN_HOST` | *(empty)* | Hostname that serves the dashboard (put it behind Cloudflare Access). Other hostnames only redirect |
+| `NUXT_ADMIN_EMAILS` | *(empty)* | Comma-separated emails that are always admin |
+| `NUXT_DEFAULT_ROLE` | `editor` | Role for new Access users: `admin`, `editor` or `viewer` |
+| `NUXT_ALLOWED_EMAIL_DOMAINS` | *(empty)* | Optional extra check on top of the Access policy |
+| `NUXT_ADMIN_GATE_PATH` | *(empty)* | Alternative to the admin host: secret path that unlocks the dashboard. Set it as a secret |
 
 Deploy exactly as upstream ([Workers guide](https://docs.sink.cool/deployment/workers)), then add the variables you want under **Worker → Settings → Variables and Secrets**. For a GTM page that behaves like classic redirects, also set `NUXT_REDIRECT_STATUS_CODE=302` and `NUXT_REDIRECT_WITH_QUERY=true`.
 

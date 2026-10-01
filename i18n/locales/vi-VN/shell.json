@@ -31,7 +31,10 @@
     "check": "Check",
     "migrate": "Nhập/Xuất",
     "clicks": "Clicks",
-    "known_ips": "Known IPs"
+    "known_ips": "Known IPs",
+    "activity": "Activity",
+    "deleted": "Deleted links",
+    "users": "Users"
   },
   "sidebar": {
     "subtitle": "Rút gọn liên kết",

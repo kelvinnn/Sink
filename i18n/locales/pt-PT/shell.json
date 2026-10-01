@@ -31,7 +31,10 @@
     "check": "Check",
     "migrate": "Importar/Exportar",
     "clicks": "Clicks",
-    "known_ips": "Known IPs"
+    "known_ips": "Known IPs",
+    "activity": "Activity",
+    "deleted": "Deleted links",
+    "users": "Users"
   },
   "sidebar": {
     "subtitle": "Encurtador de links",

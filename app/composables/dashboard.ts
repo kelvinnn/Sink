@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import { Activity, ChartArea, FolderSync, Link, MousePointerClick, ScanSearch, ShieldCheck } from '@lucide/vue'
+import { Activity, ChartArea, FolderSync, History, Link, MousePointerClick, ScanSearch, ShieldCheck, Trash2, Users } from '@lucide/vue'
 import { computed } from 'vue'
 import { useRoute } from '#imports'
 
@@ -39,6 +39,21 @@ export const DASHBOARD_ROUTES = {
     paths: ['/dashboard/known-ips'],
     titleKey: 'nav.known_ips',
     icon: ShieldCheck,
+  },
+  activity: {
+    paths: ['/dashboard/activity'],
+    titleKey: 'nav.activity',
+    icon: History,
+  },
+  deleted: {
+    paths: ['/dashboard/deleted'],
+    titleKey: 'nav.deleted',
+    icon: Trash2,
+  },
+  users: {
+    paths: ['/dashboard/users'],
+    titleKey: 'nav.users',
+    icon: Users,
   },
   check: {
     paths: ['/dashboard/check'],

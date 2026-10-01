@@ -1,4 +1,4 @@
-import { env } from 'cloudflare:workers'
+import { env, exports } from 'cloudflare:workers'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { deleteStoredLinks, fetch, postJson, setLinkStoreD1Mode } from './utils'
 
@@ -93,5 +93,49 @@ describe('admin gate', () => {
 
     const forged = await get('/dashboard', { Cookie: '_g=forged' })
     expect(forged.headers.get('location')).toBe(NOT_FOUND)
+  })
+})
+
+describe('admin host mode', () => {
+  const ADMIN_HOST = 'admin.example.test'
+
+  function onHost(host: string, path: string, headers: Record<string, string> = {}) {
+    return exports.default.fetch(new Request(`http://${host}${path}`, { redirect: 'manual', headers }))
+  }
+
+  afterEach(() => {
+    env.NUXT_ADMIN_HOST = ''
+  })
+
+  function enable() {
+    env.NUXT_ADMIN_HOST = ADMIN_HOST
+    env.NUXT_NOT_FOUND_REDIRECT = NOT_FOUND
+    env.NUXT_PUBLIC_HOME_URL = HOME
+  }
+
+  it('serves only short links on public hosts', async () => {
+    enable()
+    for (const path of ['/dashboard', '/dashboard/links', '/api/verify', '/sink.png', '/_nuxt/entry.js']) {
+      const response = await onHost('localhost', path)
+      expect(response.status, path).toBe(302)
+      expect(response.headers.get('location'), path).toBe(NOT_FOUND)
+    }
+    expect((await onHost('localhost', '/')).headers.get('location')).toBe(HOME)
+    const link = await onHost('localhost', `/${createdSlugs[0]}`)
+    expect(link.headers.get('location')).toBe('https://example.com/target')
+    // Scripts can still use the API with the site token.
+    expect((await onHost('localhost', '/api/verify', { Authorization: `Bearer ${import.meta.env.NUXT_SITE_TOKEN}` })).status).toBe(200)
+  })
+
+  it('refuses the admin host without an Access token and serves it with one', async () => {
+    enable()
+    expect((await onHost(ADMIN_HOST, '/dashboard/links')).status).toBe(403)
+    expect((await onHost(ADMIN_HOST, '/api/verify')).status).toBe(403)
+
+    // With a (here: unverifiable) Access token the request reaches Sink, which then checks it.
+    const api = await onHost(ADMIN_HOST, '/api/verify', { 'Cf-Access-Jwt-Assertion': 'not-a-real-token' })
+    expect(api.status).toBe(401)
+    const root = await onHost(ADMIN_HOST, '/', { 'Cf-Access-Jwt-Assertion': 'x' })
+    expect(root.headers.get('location')).toBe('/dashboard')
   })
 })

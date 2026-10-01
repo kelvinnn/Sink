@@ -31,7 +31,10 @@
     "check": "檢查",
     "migrate": "匯入/匯出",
     "clicks": "Clicks",
-    "known_ips": "Known IPs"
+    "known_ips": "Known IPs",
+    "activity": "Activity",
+    "deleted": "Deleted links",
+    "users": "Users"
   },
   "sidebar": {
     "subtitle": "縮網址服務",

@@ -31,7 +31,10 @@
     "check": "检测",
     "migrate": "导入/导出",
     "clicks": "Clicks",
-    "known_ips": "Known IPs"
+    "known_ips": "Known IPs",
+    "activity": "Activity",
+    "deleted": "Deleted links",
+    "users": "Users"
   },
   "sidebar": {
     "subtitle": "短链接服务",

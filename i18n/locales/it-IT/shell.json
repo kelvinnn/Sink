@@ -31,7 +31,10 @@
     "check": "Check",
     "migrate": "Importa/Esporta",
     "clicks": "Clicks",
-    "known_ips": "Known IPs"
+    "known_ips": "Known IPs",
+    "activity": "Activity",
+    "deleted": "Deleted links",
+    "users": "Users"
   },
   "sidebar": {
     "subtitle": "Accorcia i tuoi Link",

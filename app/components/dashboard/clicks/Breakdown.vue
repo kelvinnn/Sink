@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { ClickDimension } from '#shared/schemas/click'
 
-const groups: ClickDimension[][] = [
+const { canSeeIps } = useDashboardSession()
+const allGroups: ClickDimension[][] = [
   ['slug', 'tags', 'source', 'refererHost', 'inApp', 'served'],
   ['asOrg', 'networkType', 'ip', 'visitorId', 'knownIpLabel', 'botReason'],
   ['deviceType', 'os', 'browser', 'language', 'country', 'city', 'postalCode', 'day', 'hour', 'weekday'],
 ]
+// IP and visitor breakdowns are admin-only.
+const groups = computed(() => allGroups.map(group => group.filter(dimension => canSeeIps.value || !['ip', 'visitorId'].includes(dimension))))
 </script>
 
 <template>

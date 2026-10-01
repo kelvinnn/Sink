@@ -5,6 +5,7 @@ import { toast } from 'vue-sonner'
 
 const store = useDashboardClicksStore()
 const { t } = useI18n()
+const { isAdmin } = useDashboardSession()
 const exporting = shallowRef(false)
 
 const presets: ClickRangePreset[] = ['today', '7d', '30d', '90d', '180d']
@@ -50,7 +51,7 @@ async function exportCsv() {
     <Button variant="outline" size="sm" :aria-label="$t('common.try_again')" @click="store.refresh()">
       <RefreshCw aria-hidden="true" class="size-4" />
     </Button>
-    <Button variant="outline" size="sm" :disabled="exporting" @click="exportCsv">
+    <Button v-if="isAdmin" variant="outline" size="sm" :disabled="exporting" @click="exportCsv">
       <Download aria-hidden="true" class="size-4" />
       {{ $t('clicks.export') }}
     </Button>

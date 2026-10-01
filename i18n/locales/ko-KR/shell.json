@@ -31,7 +31,10 @@
     "check": "점검",
     "migrate": "가져오기/내보내기",
     "clicks": "Clicks",
-    "known_ips": "Known IPs"
+    "known_ips": "Known IPs",
+    "activity": "Activity",
+    "deleted": "Deleted links",
+    "users": "Users"
   },
   "sidebar": {
     "subtitle": "링크 단축기",

@@ -1,10 +1,19 @@
-// Admin gate: hides the Sink dashboard, API and static files behind a secret path.
+// Admin gate: hides the Sink dashboard, API and static files from the public.
 //
-// Enabled only when NUXT_ADMIN_GATE_PATH is set (e.g. "/x7k2q9"). Visiting that path sets a
-// signed cookie and opens the dashboard. Without the cookie (or, for /api, without the correct
-// bearer token), Sink-owned paths behave like an unknown slug: redirect to NUXT_NOT_FOUND_REDIRECT
-// (or 404). `/` redirects to NUXT_PUBLIC_HOME_URL. Requires assets.run_worker_first so static
-// files pass through here.
+// Two modes (both optional; with neither set the Worker behaves like upstream):
+//
+// 1. Admin host (recommended): NUXT_ADMIN_HOST=admin.example.com
+//    The dashboard, API and static files are only served on that hostname, which should sit
+//    behind Cloudflare Access. Every other hostname only resolves short links: Sink-owned
+//    paths behave like an unknown slug and `/` goes to NUXT_PUBLIC_HOME_URL.
+//    As a backstop, requests on the admin host without an Access token are refused unless
+//    NUXT_ADMIN_REQUIRE_ACCESS=false.
+//
+// 2. Secret path: NUXT_ADMIN_GATE_PATH=/x7k2q9
+//    Visiting that path sets a signed cookie that unlocks Sink-owned paths.
+//
+// In both modes `/api` also accepts the correct site token as a bearer (for scripts).
+// Requires assets.run_worker_first so static files pass through here.
 
 const COOKIE = '_g'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30
@@ -65,18 +74,63 @@ function notFound(env) {
   return new Response('Not Found', { status: 404, headers: { 'Cache-Control': 'no-store' } })
 }
 
+function publicResponse(request, env, url, inner, context) {
+  const { pathname } = url
+  if (pathname === '/robots.txt')
+    return new Response('User-agent: *\nAllow: /\n', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
+
+  if (pathname === '/') {
+    const home = env.NUXT_PUBLIC_HOME_URL || env.NUXT_HOME_URL
+    return home
+      ? new Response(null, { status: 302, headers: { 'Location': home, 'Cache-Control': 'no-store' } })
+      : notFound(env)
+  }
+
+  if (isSinkPath(pathname)) {
+    const auth = request.headers.get('authorization') || ''
+    const bearer = auth.startsWith('Bearer ') ? auth.slice(7) : ''
+    const isApi = pathname.toLowerCase() === '/api' || pathname.toLowerCase().startsWith('/api/')
+    if (isApi && env.NUXT_SITE_TOKEN && timingSafeEqual(bearer, env.NUXT_SITE_TOKEN))
+      return inner.fetch(request, env, context)
+    return notFound(env)
+  }
+
+  return inner.fetch(request, env, context)
+}
+
+function hasAccessToken(request) {
+  return !!request.headers.get('cf-access-jwt-assertion') || !!readCookie(request, 'CF_Authorization')
+}
+
 /** Wraps a Worker handler (e.g. the Nitro build) with the admin gate. */
 export function withAdminGate(inner) {
   return {
     ...inner,
     async fetch(request, env, context) {
+      const adminHost = String(env.NUXT_ADMIN_HOST || '').trim().toLowerCase()
       const gatePath = env.NUXT_ADMIN_GATE_PATH
       const secret = env.NUXT_SITE_TOKEN
-      if (!gatePath || !secret)
+      if (!adminHost && !(gatePath && secret))
         return inner.fetch(request, env, context)
 
       const url = new URL(request.url)
       const { pathname } = url
+
+      // Mode 1: admin host
+      if (adminHost) {
+        if (url.hostname.toLowerCase() !== adminHost)
+          return publicResponse(request, env, url, inner, context)
+
+        const auth = request.headers.get('authorization') || ''
+        const hasBearer = !!secret && auth.startsWith('Bearer ') && timingSafeEqual(auth.slice(7), secret)
+        if (String(env.NUXT_ADMIN_REQUIRE_ACCESS) !== 'false' && !hasAccessToken(request) && !hasBearer)
+          return new Response('Forbidden', { status: 403, headers: { 'Cache-Control': 'no-store' } })
+        if (pathname === '/')
+          return new Response(null, { status: 302, headers: { 'Location': '/dashboard', 'Cache-Control': 'no-store' } })
+        return inner.fetch(request, env, context)
+      }
+
+      // Mode 2: secret path
       const expected = await gateToken(secret)
 
       if (pathname === gatePath) {
@@ -91,30 +145,10 @@ export function withAdminGate(inner) {
         })
       }
 
-      const hasCookie = timingSafeEqual(readCookie(request, COOKIE), expected)
-      if (hasCookie)
+      if (timingSafeEqual(readCookie(request, COOKIE), expected))
         return inner.fetch(request, env, context)
 
-      if (pathname === '/robots.txt')
-        return new Response('User-agent: *\nAllow: /\n', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
-
-      if (pathname === '/') {
-        const home = env.NUXT_PUBLIC_HOME_URL || env.NUXT_HOME_URL
-        return home
-          ? new Response(null, { status: 302, headers: { 'Location': home, 'Cache-Control': 'no-store' } })
-          : notFound(env)
-      }
-
-      if (isSinkPath(pathname)) {
-        const auth = request.headers.get('authorization') || ''
-        const bearer = auth.startsWith('Bearer ') ? auth.slice(7) : ''
-        const isApi = pathname.toLowerCase() === '/api' || pathname.toLowerCase().startsWith('/api/')
-        if (isApi && timingSafeEqual(bearer, secret))
-          return inner.fetch(request, env, context)
-        return notFound(env)
-      }
-
-      return inner.fetch(request, env, context)
+      return publicResponse(request, env, url, inner, context)
     },
   }
 }

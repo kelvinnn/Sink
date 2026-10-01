@@ -8,7 +8,8 @@
     "links",
     "check",
     "migrate",
-    "clicks"
+    "clicks",
+    "admin"
   ],
   "locales": [
     {

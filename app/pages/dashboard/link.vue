@@ -97,6 +97,12 @@ linksStore.onLinkUpdate(({ link: updatedLink, type }) => {
       v-if="link?.id"
       :link="link"
     />
+    <!-- Fork: change history with revert -->
+    <DashboardLinksHistory
+      v-if="link?.id"
+      :link-id="link.id"
+      :slug="link.slug"
+    />
     <section
       v-else-if="loading"
       class="space-y-6"

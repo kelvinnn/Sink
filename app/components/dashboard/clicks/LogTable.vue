@@ -3,6 +3,7 @@ import type { ClickDimension } from '#shared/schemas/click'
 import type { ClickRow } from '@/composables/clicks'
 
 const store = useDashboardClicksStore()
+const { canSeeIps } = useDashboardSession()
 const rows = ref<ClickRow[]>([])
 const cursor = shallowRef<number | null>(null)
 const loading = shallowRef(false)
@@ -72,7 +73,7 @@ function location(row: ClickRow) {
               <TableHead class="w-36">
                 {{ $t('clicks.table.link') }}
               </TableHead>
-              <TableHead class="w-44">
+              <TableHead v-if="canSeeIps" class="w-44">
                 {{ $t('clicks.table.ip') }}
               </TableHead>
               <TableHead class="w-48">
@@ -96,7 +97,7 @@ function location(row: ClickRow) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableEmpty v-if="!loading && !error && rows.length === 0" :colspan="9">
+            <TableEmpty v-if="!loading && !error && rows.length === 0" :colspan="canSeeIps ? 9 : 8">
               {{ $t('clicks.table.empty') }}
             </TableEmpty>
             <TableRow v-for="row in rows" :key="row.id" :title="row.ua || ''">
@@ -113,7 +114,7 @@ function location(row: ClickRow) {
                   {{ row.slug }}
                 </button>
               </TableCell>
-              <TableCell class="font-mono">
+              <TableCell v-if="canSeeIps" class="font-mono">
                 <button
                   type="button" class="
                     block w-full truncate text-left
@@ -148,7 +149,9 @@ function location(row: ClickRow) {
               </TableCell>
               <TableCell>
                 <button
-                  v-if="row.visitorId" type="button" class="hover:underline" :title="row.visitorId" @click="filterBy('visitorId', row.visitorId)"
+                  v-if="row.visitorId" type="button" :class="canSeeIps ? `
+                    hover:underline
+                  ` : `cursor-default`" :title="canSeeIps ? row.visitorId : ''" @click="canSeeIps && filterBy('visitorId', row.visitorId)"
                 >
                   {{ row.newVisitor ? $t('clicks.table.new') : $t('clicks.table.returning') }}
                 </button>

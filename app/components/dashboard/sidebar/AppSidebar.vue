@@ -8,6 +8,7 @@ interface NavItem {
 
 const { title } = useAppConfig()
 const { isActive } = useDashboardRoute()
+const { isAdmin } = useDashboardSession() // Fork: admin-only pages are hidden from other roles
 
 const platformItems = computed<NavItem[]>(() => [
   {
@@ -35,6 +36,12 @@ const platformItems = computed<NavItem[]>(() => [
     isActive: isActive('clicks'),
   },
   {
+    title: 'nav.deleted',
+    url: '/dashboard/deleted',
+    icon: DASHBOARD_ROUTES.deleted.icon,
+    isActive: isActive('deleted'),
+  },
+  {
     title: 'nav.check',
     url: '/dashboard/check',
     icon: DASHBOARD_ROUTES.check.icon,
@@ -42,20 +49,34 @@ const platformItems = computed<NavItem[]>(() => [
   },
 ])
 
-const settingsItems = computed<NavItem[]>(() => [
-  {
-    title: 'nav.known_ips',
-    url: '/dashboard/known-ips',
-    icon: DASHBOARD_ROUTES.knownIps.icon,
-    isActive: isActive('knownIps'),
-  },
-  {
-    title: 'nav.migrate',
-    url: '/dashboard/migrate',
-    icon: DASHBOARD_ROUTES.migrate.icon,
-    isActive: isActive('migrate'),
-  },
-])
+const settingsItems = computed<NavItem[]>(() => isAdmin.value
+  ? [
+      {
+        title: 'nav.activity',
+        url: '/dashboard/activity',
+        icon: DASHBOARD_ROUTES.activity.icon,
+        isActive: isActive('activity'),
+      },
+      {
+        title: 'nav.users',
+        url: '/dashboard/users',
+        icon: DASHBOARD_ROUTES.users.icon,
+        isActive: isActive('users'),
+      },
+      {
+        title: 'nav.known_ips',
+        url: '/dashboard/known-ips',
+        icon: DASHBOARD_ROUTES.knownIps.icon,
+        isActive: isActive('knownIps'),
+      },
+      {
+        title: 'nav.migrate',
+        url: '/dashboard/migrate',
+        icon: DASHBOARD_ROUTES.migrate.icon,
+        isActive: isActive('migrate'),
+      },
+    ]
+  : [])
 </script>
 
 <template>

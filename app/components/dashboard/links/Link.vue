@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue'
 import type { DashboardLink } from '@/types/dashboard-links'
-import { CalendarPlus2, Copy, CopyCheck, Ellipsis, Eraser, Flame, Hourglass, Link as LinkIcon, MousePointerClick, QrCode, ShieldAlert, SquarePen, Users } from '@lucide/vue'
+import { CalendarPlus2, Copy, CopyCheck, Ellipsis, Eraser, Flame, Hourglass, Link as LinkIcon, Lock, LockOpen, MousePointerClick, QrCode, ShieldAlert, SquarePen, Users } from '@lucide/vue'
 import { useClipboard, useMediaQuery } from '@vueuse/core'
 import { parseURL } from 'ufo'
 import { toast } from 'vue-sonner'
@@ -36,8 +36,31 @@ async function openDeleteDialog() {
   deleteDialogOpen.value = true
 }
 
+// Fork: link locks (admin only) and role-based actions.
+const { isAdmin, canEdit } = useDashboardSession()
+const { locks, refresh: refreshLinkMeta } = useLinkMeta()
+const lockDialogOpen = shallowRef(false)
+const isLocked = computed(() => !!locks[props.link.id])
+
+async function openLockDialog() {
+  editPopoverOpen.value = false
+  await nextTick()
+  lockDialogOpen.value = true
+}
+
+async function unlockLink() {
+  try {
+    await useAPI('/api/link/unlock', { method: 'POST', body: { slug: props.link.slug } })
+    toast.success(t('admin.lock.unlocked'))
+    refreshLinkMeta(props.link.id)
+  }
+  catch {
+    toast.error(t('admin.lock.failed'))
+  }
+}
+
 function handlePopoverCloseAutoFocus(event: Event) {
-  if (qrDialogOpen.value || editDialogOpen.value || deleteDialogOpen.value)
+  if (qrDialogOpen.value || editDialogOpen.value || deleteDialogOpen.value || lockDialogOpen.value)
     event.preventDefault()
 }
 
@@ -264,6 +287,7 @@ function copyLink() {
               </DropdownMenuItem>
 
               <DropdownMenuItem
+                v-if="canEdit"
                 @select.prevent="openEditDialog"
               >
                 <SquarePen aria-hidden="true" />
@@ -278,9 +302,21 @@ function copyLink() {
                 </NuxtLink>
               </DropdownMenuItem>
 
-              <DropdownMenuSeparator />
+              <template v-if="isAdmin">
+                <DropdownMenuItem v-if="isLocked" @select="unlockLink">
+                  <LockOpen aria-hidden="true" />
+                  {{ $t('admin.lock.unlock') }}
+                </DropdownMenuItem>
+                <DropdownMenuItem v-else @select.prevent="openLockDialog">
+                  <Lock aria-hidden="true" />
+                  {{ $t('admin.lock.action') }}
+                </DropdownMenuItem>
+              </template>
+
+              <DropdownMenuSeparator v-if="canEdit" />
 
               <DropdownMenuItem
+                v-if="canEdit"
                 variant="destructive"
                 @select.prevent="openDeleteDialog"
               >
@@ -292,6 +328,7 @@ function copyLink() {
         </div>
       </div>
       <div class="mt-auto flex flex-col space-y-3">
+        <DashboardLinksMeta :link-id="link.id" />
         <div class="flex h-5 w-full min-w-0 space-x-2 overflow-hidden text-sm">
           <TooltipProvider>
             <Tooltip>
@@ -426,6 +463,12 @@ function copyLink() {
       v-model:open="deleteDialogOpen"
       :link="link"
       @close-auto-focus="handleDialogCloseAutoFocus"
+    />
+    <DashboardLinksLockModal
+      v-if="isAdmin"
+      v-model:open="lockDialogOpen"
+      :slug="link.slug"
+      :link-id="link.id"
     />
   </Card>
 </template>
