@@ -39,7 +39,7 @@ Set `NUXT_CLICK_LOG=true` and every visit is stored as one row in your own D1 da
 - **Network:** full IP (IPv4 / IPv6), ASN, ISP / organisation, network type (ISP, data centre, privacy relay, corporate proxy)
 - **Place:** country, region, city, postal code, coordinates, timezone
 - **Device:** type, vendor, model, OS, browser, and the **in-app browser** (Instagram, Facebook, TikTok, WhatsApp, WeChat, LINE, …)
-- **Source:** full referrer, raw query string, `?s=` / `utm_source`
+- **Source:** full referrer, raw query string, and a source tag from `?src=` or `utm_source` (`?s=` also works, but GA4 treats `s` as a site-search term)
 - **Visitor:** first-party cookie ID, new vs returning
 - **Quality:** bot flag with reasons (preview bot, data-centre network, HTTP client, headless browser)
 - Automatic retention (`NUXT_CLICK_LOG_RETENTION_DAYS`, default 183) and CSV export
