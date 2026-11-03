@@ -10,9 +10,14 @@ export default eventHandler(async (event) => {
   if (path === '/' ? !useRuntimeConfig(event).bioHome : path.includes('/', 1) || path.startsWith('/_') || path.startsWith('/api') || path.startsWith('/dashboard'))
     return
 
-  const { value: page, configured } = await getSetting(event, 'bio', BioPageSchema)
-  if (!configured || !page.enabled)
+  // Never let a settings read failure get in the way of a redirect.
+  const setting = await getSetting(event, 'bio', BioPageSchema).catch((error) => {
+    console.error({ event: 'bio.settings.read.failed', message: String(error) })
+    return null
+  })
+  if (!setting?.configured || !setting.value.enabled)
     return
+  const page = setting.value
   if (path !== '/' && path.slice(1).toLowerCase() !== page.path.toLowerCase())
     return
 
