@@ -76,6 +76,12 @@ const settingsItems = computed<NavItem[]>(() => isAdmin.value
         isActive: isActive('qrStyle'),
       },
       {
+        title: 'nav.bio',
+        url: '/dashboard/bio',
+        icon: DASHBOARD_ROUTES.bio.icon,
+        isActive: isActive('bio'),
+      },
+      {
         title: 'nav.migrate',
         url: '/dashboard/migrate',
         icon: DASHBOARD_ROUTES.migrate.icon,

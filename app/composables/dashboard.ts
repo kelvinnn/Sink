@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import { Activity, ChartArea, FolderSync, History, Link, MousePointerClick, QrCode, ScanSearch, ShieldCheck, Trash2, Users } from '@lucide/vue'
+import { Activity, ChartArea, FolderSync, History, LayoutList, Link, MousePointerClick, QrCode, ScanSearch, ShieldCheck, Trash2, Users } from '@lucide/vue'
 import { computed } from 'vue'
 import { useRoute } from '#imports'
 
@@ -59,6 +59,11 @@ export const DASHBOARD_ROUTES = {
     paths: ['/dashboard/qr-style'],
     titleKey: 'nav.qr_style',
     icon: QrCode,
+  },
+  bio: {
+    paths: ['/dashboard/bio'],
+    titleKey: 'nav.bio',
+    icon: LayoutList,
   },
   check: {
     paths: ['/dashboard/check'],

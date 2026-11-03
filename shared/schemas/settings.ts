@@ -31,3 +31,25 @@ export const QrStyleSchema = z.object({
 export type QrStyle = z.infer<typeof QrStyleSchema>
 
 export const DEFAULT_QR_STYLE: QrStyle = QrStyleSchema.parse({})
+
+export const BioButtonSchema = z.object({
+  label: z.string().trim().min(1).max(120),
+  slug: z.string().trim().min(1).max(256).regex(/^[\w.\-/]+$/, 'Use an existing short link slug').transform(slug => slug.replace(/^\/+|\/+$/g, '')),
+})
+
+/** Links page ("link in bio"): a branded list of short links. */
+export const BioPageSchema = z.object({
+  enabled: z.boolean().default(false),
+  path: z.string().trim().min(1).max(64).regex(/^[\w.-]+$/, 'One path segment, e.g. links').default('links'),
+  title: z.string().trim().max(120).default(''),
+  description: z.string().trim().max(300).default(''),
+  logo: LogoDataUrlSchema.nullable().default(null),
+  background: hexColor.default('#f5f5f4'),
+  text: hexColor.default('#1c1917'),
+  buttonBackground: hexColor.default('#ffffff'),
+  buttonText: hexColor.default('#1c1917'),
+  buttons: z.array(BioButtonSchema).max(60).default([]),
+})
+
+export type BioPage = z.infer<typeof BioPageSchema>
+export type BioPageInput = z.input<typeof BioPageSchema>

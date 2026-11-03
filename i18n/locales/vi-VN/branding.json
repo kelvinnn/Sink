@@ -56,6 +56,35 @@
         "utm_medium": "?utm_medium=qr_code",
         "qr": "?qr=1"
       }
+    },
+    "bio": {
+      "title": "Links page",
+      "description": "A branded page of your short links, like a \"link in bio\". Every button is a short link, so clicks are logged and tracking tags fire.",
+      "home_off": "The home page still redirects as before. To show this page on the home page instead, set NUXT_BIO_HOME=true on the Worker.",
+      "home_on": "NUXT_BIO_HOME is on: when the page is enabled it is also shown on the home page.",
+      "saved": "Links page saved",
+      "save_failed": "Could not save the links page",
+      "save": "Save links page",
+      "add_button": "Add button",
+      "move_up": "Move up",
+      "move_down": "Move down",
+      "fields": {
+        "enabled": "Published",
+        "enabled_hint": "When on, the page is live at {url}",
+        "path": "Address",
+        "path_hint": "One path segment that is not used by a short link.",
+        "title": "Title",
+        "description": "Subtitle",
+        "logo": "Logo",
+        "background": "Background",
+        "text": "Text",
+        "buttonBackground": "Buttons",
+        "buttonText": "Button text",
+        "buttons": "Buttons",
+        "buttons_hint": "In order, top to bottom. Each button opens an existing short link (enter its slug, e.g. menu or wa/amk).",
+        "label": "Button text",
+        "slug": "Short link slug"
+      }
     }
   }
 }

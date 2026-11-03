@@ -35,7 +35,8 @@
     "activity": "Activity",
     "deleted": "Deleted links",
     "users": "Users",
-    "qr_style": "QR style"
+    "qr_style": "QR style",
+    "bio": "Links page"
   },
   "sidebar": {
     "subtitle": "Encurtador de links",

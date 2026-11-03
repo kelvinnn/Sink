@@ -79,6 +79,10 @@ function publicResponse(request, env, url, inner, context) {
   if (pathname === '/robots.txt')
     return new Response('User-agent: *\nAllow: /\n', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
 
+  // Fork: the links page replaces the home redirect when NUXT_BIO_HOME=true (rendered by the app).
+  if (pathname === '/' && String(env.NUXT_BIO_HOME) === 'true')
+    return inner.fetch(request, env, context)
+
   if (pathname === '/') {
     const home = env.NUXT_PUBLIC_HOME_URL || env.NUXT_HOME_URL
     return home

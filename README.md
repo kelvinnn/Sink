@@ -27,6 +27,7 @@ Hosted shorteners such as Bitly, Short.io, Rebrandly and Dub typically put retar
 | Link locks (optionally until a date) for links on printed materials | — | ✅ |
 | Branded QR codes: colours, dot / corner style, centre logo, print-size PNG and SVG, one house style | Colour only | ✅ |
 | Destination allow-list: editors can only link to approved domains | — | ✅ |
+| Links page ("link in bio") built from your short links, edited in the dashboard | — | ✅ |
 | Hidden admin: dashboard, API and assets invisible on your public short domain | — | ✅ |
 | Everything in Sink: analytics, QR codes, AI slugs, geo / device routing, import / export, MCP | ✅ | ✅ |
 
@@ -72,6 +73,9 @@ Put the dashboard behind [Cloudflare Access](https://docs.sink.cool/configuratio
 ### 🔳 Branded QR codes for print
 An admin sets one **QR style** for the whole dashboard (Settings → QR style), with a live preview: dot, background and finder colours, dot style, corner style, error correction (auto = H when there is a centre image), an optional centre logo (PNG or SVG) and an optional scan marker (`?utm_medium=qr_code` or `?qr=1`) so scans show up as QR scans in the click log. Every link's QR code then uses that style, and anyone can download it as a 2048 px PNG (≈ 17 cm at 300 dpi) or as an SVG. Until a style is saved, QR codes look exactly like upstream.
 
+### 🔗 Links page ("link in bio")
+Replace Linktree-style pages with your own: an admin edits a title, subtitle, logo, colours and an ordered list of buttons (Settings → Links page, with a live preview). Every button is one of your short links, so each tap is in the click log and fires your tracking page. Publish it on a path of your choice (for example `/links`); set `NUXT_BIO_HOME=true` to also show it on the home page instead of the home redirect. Off until you publish it.
+
 ### 🕶️ Hidden admin
 Set `NUXT_ADMIN_HOST` (for example `admin.example.com`, behind Cloudflare Access) and the dashboard, API and static files are served only there. Your public short domain answers every other path like an unknown link. Alternatively, `NUXT_ADMIN_GATE_PATH` unlocks the dashboard through a secret path. Either way `robots.txt` is neutral, `workers.dev` and preview URLs are off, and the redirect page carries no branding.
 
@@ -96,6 +100,7 @@ Set `NUXT_ADMIN_HOST` (for example `admin.example.com`, behind Cloudflare Access
 | `NUXT_DEFAULT_ROLE` | `editor` | Role for new Access users: `admin`, `editor` or `viewer` |
 | `NUXT_ALLOWED_EMAIL_DOMAINS` | *(empty)* | Optional extra check on top of the Access policy |
 | `NUXT_ALLOWED_DESTINATION_HOSTS` | *(empty)* | Comma-separated destination hosts editors may link to (subdomains included). Empty = any host |
+| `NUXT_BIO_HOME` | `false` | Show the published links page on `/` instead of redirecting to the home URL |
 | `NUXT_ADMIN_GATE_PATH` | *(empty)* | Alternative to the admin host: secret path that unlocks the dashboard. Set it as a secret |
 
 Deploy exactly as upstream ([Workers guide](https://docs.sink.cool/deployment/workers)), then add the variables you want under **Worker → Settings → Variables and Secrets**. For a GTM page that behaves like classic redirects, also set `NUXT_REDIRECT_STATUS_CODE=302` and `NUXT_REDIRECT_WITH_QUERY=true`.

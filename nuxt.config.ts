@@ -57,6 +57,8 @@ export default defineNuxtConfig({
     allowedEmailDomains: '',
     // Fork: comma-separated destination hosts (a host also allows its subdomains). Empty = any host.
     allowedDestinationHosts: '',
+    // Fork: serve the links page (dashboard → Links page) on `/` instead of redirecting home.
+    bioHome: false,
     public: {
       previewMode: '',
       slugDefaultLength: '6',
