@@ -2,7 +2,7 @@ import { env } from 'cloudflare:workers'
 import { eq, inArray } from 'drizzle-orm'
 import { exportJWK, generateKeyPair, SignJWT } from 'jose'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { activity, clicks, linkLocks, users } from '../server/database/schema'
+import { activity, clicks, linkLocks, settings, users } from '../server/database/schema'
 import { db, deleteStoredLinks, fetch, fetchWithAuth, setLinkStoreD1Mode } from './utils'
 
 // Fork tests: roles, activity log, restore / revert, link locks, click redaction.
@@ -44,6 +44,7 @@ afterAll(async () => {
   await deleteStoredLinks(createdSlugs)
   await db.delete(users).where(inArray(users.email, [ADMIN, EDITOR, VIEWER, 'gone@example.com']))
   await db.delete(linkLocks)
+  await db.delete(settings)
 })
 
 async function tokenFor(email: string) {
@@ -224,5 +225,27 @@ describe('click log privacy', () => {
     expect((await as(EDITOR, `/api/clicks/breakdown?slug=${slug}&dimension=deviceType`)).status).toBe(200)
     // Searching by IP text finds nothing for editors.
     expect(((await (await as(EDITOR, `/api/clicks/list?slug=${slug}&q=203.0.113`)).json()) as { clicks: unknown[] }).clicks).toHaveLength(0)
+  })
+})
+
+describe('qr style setting', () => {
+  const PNG_LOGO = `data:image/png;base64,${btoa('fake-png-bytes')}`
+
+  it('returns the standard style until an admin saves one, and only admins can save', async () => {
+    await db.delete(settings)
+    const initial = await (await as(EDITOR, '/api/settings/qr-style')).json() as { configured: boolean, style: Record<string, unknown> }
+    expect(initial).toMatchObject({ configured: false, style: { dotStyle: 'dots', cornerStyle: 'rounded', errorCorrection: 'auto', logo: null, scanMarker: 'none' } })
+
+    const style = { foreground: '#7a1f1f', background: '#fff8e7', finder: '#d4a017', dotStyle: 'rounded', cornerStyle: 'square', errorCorrection: 'auto', logo: PNG_LOGO, linkIcon: false, scanMarker: 'utm_medium' }
+    expect((await as(EDITOR, '/api/settings/qr-style', { method: 'POST', body: style })).status).toBe(403)
+    expect((await as(ADMIN, '/api/settings/qr-style', { method: 'POST', body: { ...style, foreground: 'red' } })).status).toBe(400)
+    expect((await as(ADMIN, '/api/settings/qr-style', { method: 'POST', body: { ...style, logo: 'data:image/gif;base64,R0lGOD' } })).status).toBe(400)
+    expect((await as(ADMIN, '/api/settings/qr-style', { method: 'POST', body: style })).status).toBe(200)
+
+    const saved = await (await as(VIEWER, '/api/settings/qr-style')).json() as { configured: boolean, style: Record<string, unknown>, updatedBy: string }
+    expect(saved).toMatchObject({ configured: true, style, updatedBy: ADMIN })
+
+    const [entry] = (await (await as(ADMIN, '/api/activity/list?action=settings.update')).json() as { activity: { targetId: string, after: Record<string, unknown> }[] }).activity
+    expect(entry).toMatchObject({ targetId: 'qr-style', after: { foreground: '#7a1f1f', logo: expect.stringMatching(/^\(image, \d+ KB\)$/) } })
   })
 })

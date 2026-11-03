@@ -70,6 +70,12 @@ const settingsItems = computed<NavItem[]>(() => isAdmin.value
         isActive: isActive('knownIps'),
       },
       {
+        title: 'nav.qr_style',
+        url: '/dashboard/qr-style',
+        icon: DASHBOARD_ROUTES.qrStyle.icon,
+        isActive: isActive('qrStyle'),
+      },
+      {
         title: 'nav.migrate',
         url: '/dashboard/migrate',
         icon: DASHBOARD_ROUTES.migrate.icon,

@@ -9,7 +9,8 @@
     "check",
     "migrate",
     "clicks",
-    "admin"
+    "admin",
+    "branding"
   ],
   "locales": [
     {

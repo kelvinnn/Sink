@@ -179,3 +179,11 @@ export const linkLocks = sqliteTable('link_locks', {
 }, table => [
   index('link_locks_slug_idx').on(table.slug),
 ])
+
+// Fork: small key/value store for dashboard-wide settings (QR style, links page, ...).
+export const settings = sqliteTable('settings', {
+  key: text().primaryKey(),
+  value: text({ mode: 'json' }).$type<Record<string, unknown>>().notNull(),
+  updatedAt: integer('updated_at').notNull(), // unix milliseconds
+  updatedBy: text('updated_by'),
+})

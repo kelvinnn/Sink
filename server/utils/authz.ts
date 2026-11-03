@@ -51,6 +51,7 @@ const ROUTE_RULES: [method: string | null, prefix: string, role: Role][] = [
   [null, '/api/link/unlock', 'admin'],
   [null, '/api/backup', 'admin'],
   [null, '/api/mcp', 'admin'],
+  ['POST', '/api/settings/', 'admin'],
   // editor
   [null, '/api/link/create', 'editor'],
   [null, '/api/link/edit', 'editor'],

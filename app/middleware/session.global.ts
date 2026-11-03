@@ -1,5 +1,5 @@
 // Fork: load the user's role for dashboard pages and keep non-admins out of admin pages.
-const ADMIN_PAGES = ['/dashboard/activity', '/dashboard/users', '/dashboard/known-ips', '/dashboard/migrate']
+const ADMIN_PAGES = ['/dashboard/activity', '/dashboard/users', '/dashboard/known-ips', '/dashboard/migrate', '/dashboard/qr-style']
 
 export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.server || !to.path.startsWith('/dashboard') || to.path === '/dashboard/login')

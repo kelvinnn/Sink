@@ -1,0 +1,61 @@
+{
+  "branding": {
+    "qr_style": {
+      "title": "QR code style",
+      "description": "The default look of every link's QR code. Editors and viewers download codes in this style.",
+      "preview": "Preview",
+      "preview_hint": "Example link. Test-scan a printed proof before a print run.",
+      "not_configured": "Not saved yet: QR codes use the standard look until you save a style.",
+      "updated": "Last saved {time} by {who}",
+      "saved": "QR style saved",
+      "save_failed": "Could not save the QR style",
+      "save": "Save style",
+      "reset": "Reset to standard look",
+      "edit_default": "Edit default style",
+      "download_png": "PNG {size} px",
+      "download_svg": "SVG",
+      "fields": {
+        "foreground": "Dots colour",
+        "background": "Background colour",
+        "finder": "Corner (finder) colour",
+        "dot_style": "Dot style",
+        "corner_style": "Corner style",
+        "error_correction": "Error correction",
+        "error_correction_hint": "Higher levels survive damage and a centre logo better, but make denser codes. Auto uses H with a centre image, otherwise Q.",
+        "logo": "Centre logo",
+        "logo_hint": "PNG or SVG, up to 200 KB. Square images with some padding work best.",
+        "logo_upload": "Upload logo",
+        "logo_remove": "Remove logo",
+        "logo_invalid": "Upload a PNG or SVG image smaller than 200 KB",
+        "link_icon": "Without a logo, show the destination site's icon",
+        "scan_marker": "Mark scans in the click log",
+        "scan_marker_hint": "Adds a parameter to the encoded short link so scans are counted as QR scans. It is passed on to the destination."
+      },
+      "dot_styles": {
+        "square": "Square",
+        "dots": "Dots",
+        "rounded": "Rounded",
+        "extra-rounded": "Extra rounded",
+        "classy": "Classy",
+        "classy-rounded": "Classy rounded"
+      },
+      "corner_styles": {
+        "square": "Square",
+        "rounded": "Rounded",
+        "dot": "Circle"
+      },
+      "error_levels": {
+        "auto": "Auto",
+        "L": "L (7%)",
+        "M": "M (15%)",
+        "Q": "Q (25%)",
+        "H": "H (30%)"
+      },
+      "scan_markers": {
+        "none": "Off",
+        "utm_medium": "?utm_medium=qr_code",
+        "qr": "?qr=1"
+      }
+    }
+  }
+}

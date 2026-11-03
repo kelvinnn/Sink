@@ -34,7 +34,8 @@
     "known_ips": "Known IPs",
     "activity": "Activity",
     "deleted": "Deleted links",
-    "users": "Users"
+    "users": "Users",
+    "qr_style": "QR style"
   },
   "sidebar": {
     "subtitle": "링크 단축기",

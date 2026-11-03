@@ -69,7 +69,8 @@
       "links_export": "Links exported",
       "links_backup": "Backup run",
       "user_create": "User added",
-      "user_update": "User changed"
+      "user_update": "User changed",
+      "settings_update": "Settings changed"
     },
     "activity": {
       "title": "Activity",

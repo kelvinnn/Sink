@@ -1,53 +1,55 @@
 <script setup lang="ts">
-import { Download } from '@lucide/vue'
+import type { QrStyle } from '#shared/schemas/settings'
+import { Download, Palette } from '@lucide/vue'
 import QRCodeStyling from 'qr-code-styling'
+import { DEFAULT_QR_STYLE } from '#shared/schemas/settings'
+import { QR_PRINT_SIZE, qrData, qrStylingOptions } from '#shared/utils/qr-style'
 
 const props = withDefaults(defineProps<{
   data: string
   image?: string
+  // Fork: preview a style that is not saved yet (QR style settings page).
+  qrStyle?: QrStyle
 }>(), {
   image: '',
+  qrStyle: undefined,
 })
-const color = ref('#000000')
-const options = {
-  width: 256,
-  height: 256,
-  data: props.data,
-  type: 'svg' as const,
-  margin: 10,
-  qrOptions: { typeNumber: 0 as const, mode: 'Byte' as const, errorCorrectionLevel: 'Q' as const },
-  imageOptions: { hideBackgroundDots: true, imageSize: 0.4, margin: 2 },
-  dotsOptions: { type: 'dots' as const, color: '#000000' },
-  backgroundOptions: { color: '#ffffff' },
-  image: props.image,
-  cornersSquareOptions: { type: 'extra-rounded' as const, color: '#000000' },
-  cornersDotOptions: { type: 'dot' as const, color: '#000000' },
-}
 
-const qrCode = new QRCodeStyling(options)
+// Fork: codes use the admin's default style once one is saved; until then, upstream's look and colour picker.
+const { state: savedStyle, load: loadStyle } = useQrStyle()
+const { isAdmin } = useDashboardSession()
+const color = ref('#000000')
+const configured = computed(() => !!props.qrStyle || !!savedStyle.value?.configured)
+const style = computed<QrStyle>(() => {
+  if (props.qrStyle)
+    return props.qrStyle
+  if (savedStyle.value?.configured)
+    return savedStyle.value.style
+  return { ...DEFAULT_QR_STYLE, foreground: color.value, finder: color.value }
+})
+const encoded = computed(() => qrData(props.data, style.value.scanMarker))
+
+const qrCode = new QRCodeStyling(qrStylingOptions(style.value, { data: encoded.value, image: props.image, size: 256 }))
 const qrCodeEl = useTemplateRef<HTMLElement>('qrCodeEl')
 
-function updateColor(newColor: string) {
-  qrCode.update({
-    dotsOptions: { type: 'dots' as const, color: newColor },
-    cornersSquareOptions: { type: 'extra-rounded' as const, color: newColor },
-    cornersDotOptions: { type: 'dot' as const, color: newColor },
-  })
-}
+watch([style, encoded, () => props.image], () => {
+  qrCode.update(qrStylingOptions(style.value, { data: encoded.value, image: props.image, size: 256 }))
+}, { deep: true })
 
-watch(color, (newColor) => {
-  updateColor(newColor)
-})
-
-function downloadQRCode() {
-  const slug = props.data.split('/').pop()
-  qrCode.download({
-    extension: 'png',
-    name: `qr_${slug}`,
-  })
+function downloadQRCode(extension: 'png' | 'svg') {
+  const slug = props.data.replace(/^https?:\/\/[^/]+\/?/, '').replace(/[^\w.-]+/g, '_') || 'home'
+  const printable = new QRCodeStyling(qrStylingOptions(style.value, {
+    data: encoded.value,
+    image: props.image,
+    size: QR_PRINT_SIZE,
+    type: extension === 'svg' ? 'svg' : 'canvas',
+  }))
+  printable.download({ extension, name: `qr_${slug}` })
 }
 
 onMounted(() => {
+  if (!props.qrStyle)
+    void loadStyle()
   if (qrCodeEl.value) {
     qrCode.append(qrCodeEl.value as unknown as HTMLElement)
   }
@@ -58,13 +60,13 @@ onMounted(() => {
   <div class="flex flex-col items-center gap-4">
     <div
       ref="qrCodeEl"
-      :data-text="data"
+      :data-text="encoded"
       role="img"
-      :aria-label="$t('links.qr.text_alternative', { url: data })"
+      :aria-label="$t('links.qr.text_alternative', { url: encoded })"
       class="rounded-lg border border-border bg-white p-1 shadow-sm"
     />
-    <div class="flex items-center gap-4">
-      <div class="relative flex items-center">
+    <div class="flex flex-wrap items-center justify-center gap-2">
+      <div v-if="!configured" class="relative flex items-center">
         <label
           class="
             relative size-11 cursor-pointer overflow-hidden rounded-full border
@@ -91,11 +93,31 @@ onMounted(() => {
           min-h-11
           lg:min-h-8
         "
-        @click="downloadQRCode"
+        :aria-label="`${$t('links.download_qr_code')} (PNG)`"
+        @click="downloadQRCode('png')"
       >
         <Download aria-hidden="true" class="mr-2 size-4" />
-        {{ $t('links.download_qr_code') }}
+        {{ $t('branding.qr_style.download_png', { size: QR_PRINT_SIZE }) }}
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        class="
+          min-h-11
+          lg:min-h-8
+        "
+        :aria-label="`${$t('links.download_qr_code')} (SVG)`"
+        @click="downloadQRCode('svg')"
+      >
+        <Download aria-hidden="true" class="mr-2 size-4" />
+        {{ $t('branding.qr_style.download_svg') }}
       </Button>
     </div>
+    <Button v-if="isAdmin && !qrStyle" variant="link" size="sm" as-child>
+      <NuxtLink to="/dashboard/qr-style">
+        <Palette aria-hidden="true" class="mr-1 size-4" />
+        {{ $t('branding.qr_style.edit_default') }}
+      </NuxtLink>
+    </Button>
   </div>
 </template>
