@@ -73,6 +73,7 @@
       "browser": "Browser",
       "inApp": "In-app",
       "source": "Source",
+      "trigger": "Opened via",
       "refererHost": "Referrer",
       "served": "Served as",
       "ip": "IP",
@@ -83,6 +84,12 @@
       "hour": "Hour",
       "weekday": "Weekday",
       "day": "Day"
+    },
+    "trigger": {
+      "all": "All",
+      "qr": "QR scan",
+      "link": "Link",
+      "qr_hint": "Opened from a QR code (utm_medium=qr_code or qr=1 in the link)"
     },
     "table": {
       "title": "Click log",

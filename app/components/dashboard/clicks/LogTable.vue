@@ -159,6 +159,9 @@ function location(row: ClickRow) {
               </TableCell>
               <TableCell>
                 <div class="flex flex-wrap gap-1">
+                  <Badge v-if="row.trigger === 'qr'" variant="default" :title="$t('clicks.trigger.qr_hint')">
+                    {{ $t('clicks.trigger.qr') }}
+                  </Badge>
                   <Badge v-if="row.isBot" variant="destructive" :title="row.botReason || ''">
                     {{ $t('clicks.table.bot') }}
                   </Badge>

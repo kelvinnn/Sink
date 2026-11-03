@@ -2,6 +2,7 @@ import { env } from 'cloudflare:workers'
 import { eq } from 'drizzle-orm'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { clicks, knownIps } from '../server/database/schema'
+import { detectTrigger } from '../shared/utils/click-trigger'
 import { expandIpv6, parseIpRange } from '../shared/utils/ip'
 import { db, deleteStoredLinks, fetch, fetchWithAuth, postJson, setLinkStoreD1Mode } from './utils'
 
@@ -158,5 +159,45 @@ describe('click log', () => {
     expect(lines).toHaveLength(3)
 
     expect((await fetch('/api/clicks/list')).status).toBe(401)
+  })
+})
+
+describe('qr scan trigger', () => {
+  it('detects QR scans from the query string', () => {
+    expect(detectTrigger(new URLSearchParams('utm_medium=qr_code'))).toBe('qr')
+    expect(detectTrigger(new URLSearchParams('utm_source=x&utm_medium=QR_Code'))).toBe('qr')
+    expect(detectTrigger(new URLSearchParams('qr=1'))).toBe('qr')
+    expect(detectTrigger(new URLSearchParams('utm_medium=shortlink'))).toBe('link')
+    expect(detectTrigger(new URLSearchParams('qr=0'))).toBe('link')
+    expect(detectTrigger(new URLSearchParams(''))).toBe('link')
+  })
+
+  it('records the trigger, keeps the query on the destination, and filters, groups and exports by it', async () => {
+    const slug = `cl-qr-${crypto.randomUUID()}`
+    await createLink(slug, 'https://example.com/menu')
+    env.NUXT_REDIRECT_WITH_QUERY = 'true'
+    try {
+      const scan = await visit(`/${slug}?utm_medium=qr_code`, { 'User-Agent': IPHONE, 'CF-Connecting-IP': '203.0.113.30' })
+      expect(scan.headers.get('location')).toBe('https://example.com/menu?utm_medium=qr_code')
+    }
+    finally {
+      env.NUXT_REDIRECT_WITH_QUERY = 'false'
+    }
+    await visit(`/${slug}?qr=1`, { 'User-Agent': IPHONE, 'CF-Connecting-IP': '203.0.113.31' })
+    await visit(`/${slug}`, { 'User-Agent': IPHONE, 'CF-Connecting-IP': '203.0.113.32' })
+    const rows = await waitForClicks(slug, 3)
+    expect(rows.map(row => row.trigger).sort()).toEqual(['link', 'qr', 'qr'])
+
+    const qrOnly = await (await fetchWithAuth(`/api/clicks/list?slug=${slug}&trigger=qr`)).json() as { clicks: { trigger: string }[] }
+    expect(qrOnly.clicks).toHaveLength(2)
+    expect((await fetchWithAuth(`/api/clicks/list?slug=${slug}&trigger=bogus`)).status).toBe(400)
+
+    const breakdown = await (await fetchWithAuth(`/api/clicks/breakdown?slug=${slug}&dimension=trigger`)).json() as { data: { value: string, clicks: number }[] }
+    expect(Object.fromEntries(breakdown.data.map(d => [d.value, d.clicks]))).toEqual({ qr: 2, link: 1 })
+
+    const csv = (await (await fetchWithAuth(`/api/clicks/export?slug=${slug}&trigger=link`)).text()).trim().split('\n')
+    expect(csv[0]).toContain(',source,trigger,')
+    expect(csv).toHaveLength(2)
+    expect(csv[1]).toMatch(/,link,/)
   })
 })

@@ -104,6 +104,7 @@ export const clicks = sqliteTable('clicks', {
   refererHost: text('referer_host'),
   query: text(), // raw incoming query string
   source: text(), // ?s= or utm_source
+  trigger: text().notNull().default('link'), // qr (utm_medium=qr_code or qr=1) | link
   visitorId: text('visitor_id'),
   newVisitor: integer('new_visitor', { mode: 'boolean' }),
   isBot: integer('is_bot', { mode: 'boolean' }).notNull().default(false),
@@ -117,6 +118,7 @@ export const clicks = sqliteTable('clicks', {
   index('clicks_ip_idx').on(table.ip),
   index('clicks_ip_v4_idx').on(table.ipV4),
   index('clicks_visitor_id_idx').on(table.visitorId),
+  index('clicks_trigger_ts_idx').on(table.trigger, table.ts),
 ])
 
 // Fork: labelled IPs / ranges (outlets, office, agency, ...). Matched when clicks are written.

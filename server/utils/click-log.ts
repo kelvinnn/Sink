@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/d1'
 import { UAParser } from 'ua-parser-js'
 import { CLIs, Crawlers, Emails, ExtraDevices, Fetchers, InApps } from 'ua-parser-js/extensions'
 import { parseURL } from 'ufo'
+import { detectTrigger } from '#shared/utils/click-trigger'
 import { expandIpv6, ipInRange, ipv4ToInt } from '#shared/utils/ip'
 import { clicks, knownIps } from '../database/schema'
 
@@ -232,6 +233,7 @@ export function logClick(event: H3Event, link: Link, destination: string, served
       refererHost: parseURL(referer).host || null,
       query: query || null,
       source,
+      trigger: detectTrigger(params),
       visitorId,
       newVisitor: visitorId ? newVisitor : null,
       isBot,

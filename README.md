@@ -16,6 +16,7 @@ Hosted shorteners such as Bitly, Short.io, Rebrandly and Dub typically put retar
 | Retargeting pixels on redirect (GTM → Meta Pixel, Google Ads, GA4, TikTok, …) | — | ✅ |
 | Raw per-click log: IP, ISP / ASN, postal-code area, device, in-app browser, referrer, source | — | ✅ |
 | New vs returning visitors (first-party cookie) | — | ✅ |
+| QR scans told apart from link clicks | — | ✅ |
 | Bot, link-preview and email-scanner detection with reasons | Basic | ✅ |
 | Known IPs: label and exclude your own networks (shops, office, agency) | — | ✅ |
 | Clicks dashboard: filters, weekday × hour heatmap, breakdowns, CSV export | — | ✅ |
@@ -44,12 +45,13 @@ Set `NUXT_CLICK_LOG=true` and every visit is stored as one row in your own D1 da
 - **Place:** country, region, city, postal code, coordinates, timezone
 - **Device:** type, vendor, model, OS, browser, and the **in-app browser** (Instagram, Facebook, TikTok, WhatsApp, WeChat, LINE, …)
 - **Source:** full referrer, raw query string, and a source tag from `?src=` or `utm_source` (`?s=` also works, but GA4 treats `s` as a site-search term)
+- **QR scan or link:** clicks whose short link carries `utm_medium=qr_code` (the convention used by most QR generators) or `qr=1` are marked as QR scans; the query is still passed on to the destination
 - **Visitor:** first-party cookie ID, new vs returning
 - **Quality:** bot flag with reasons (preview bot, data-centre network, HTTP client, headless browser)
 - Automatic retention (`NUXT_CLICK_LOG_RETENTION_DAYS`, default 183) and CSV export
 
 ### 📊 Clicks dashboard
-A new **Clicks** page: period, bot and known-IP filters; search; totals; a weekday × hour heatmap; breakdowns by link, tag, source, referrer, in-app browser, network, IP, visitor, device, location and time (click any row to filter); the raw log; CSV export. Filters live in the URL, and every link has a **Clicks** shortcut.
+A new **Clicks** page: period, bot, known-IP and QR-scan filters; search; totals; a weekday × hour heatmap; breakdowns by link, QR scan vs link, tag, source, referrer, in-app browser, network, IP, visitor, device, location and time (click any row to filter); the raw log; CSV export. Filters live in the URL, and every link has a **Clicks** shortcut.
 
 ### 🛡️ Known IPs
 Label IP addresses or CIDR ranges (shop Wi-Fi, office, agency) and exclude them from stats. Labels can be re-applied to past clicks.

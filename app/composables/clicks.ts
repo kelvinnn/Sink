@@ -35,6 +35,7 @@ export interface ClickRow {
   refererHost: string | null
   query: string | null
   source: string | null
+  trigger: 'qr' | 'link'
   visitorId: string | null
   newVisitor: boolean | null
   isBot: boolean

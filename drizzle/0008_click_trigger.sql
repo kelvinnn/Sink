@@ -1,0 +1,3 @@
+ALTER TABLE `clicks` ADD `trigger` text DEFAULT 'link' NOT NULL;--> statement-breakpoint
+CREATE INDEX `clicks_trigger_ts_idx` ON `clicks` (`trigger`,`ts`);--> statement-breakpoint
+UPDATE `clicks` SET `trigger` = 'qr' WHERE '&' || lower(coalesce(`query`, '')) || '&' LIKE '%&utm_medium=qr_code&%' OR '&' || lower(coalesce(`query`, '')) || '&' LIKE '%&utm_medium=qrcode&%' OR '&' || lower(coalesce(`query`, '')) || '&' LIKE '%&utm_medium=qr-code&%' OR '&' || lower(coalesce(`query`, '')) || '&' LIKE '%&utm_medium=qr&%' OR '&' || lower(coalesce(`query`, '')) || '&' LIKE '%&qr=1&%' OR '&' || lower(coalesce(`query`, '')) || '&' LIKE '%&qr=true&%';

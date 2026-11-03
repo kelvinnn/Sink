@@ -10,6 +10,11 @@ const exporting = shallowRef(false)
 
 const presets: ClickRangePreset[] = ['today', '7d', '30d', '90d', '180d']
 const triStates: ClickTriState[] = ['exclude', 'include', 'only']
+const triggers = ['qr', 'link'] as const
+const trigger = computed({
+  get: () => store.filters.trigger ?? '',
+  set: (value: string) => store.setFilter('trigger', value || undefined),
+})
 
 async function exportCsv() {
   exporting.value = true
@@ -46,6 +51,14 @@ async function exportCsv() {
     <NativeSelect v-model="store.known" size="sm" :aria-label="$t('clicks.toggles.known')">
       <NativeSelectOption v-for="state in triStates" :key="state" :value="state">
         {{ $t('clicks.toggles.known') }}: {{ $t(`clicks.toggles.${state}`) }}
+      </NativeSelectOption>
+    </NativeSelect>
+    <NativeSelect v-model="trigger" size="sm" :aria-label="$t('clicks.dimensions.trigger')">
+      <NativeSelectOption value="">
+        {{ $t('clicks.dimensions.trigger') }}: {{ $t('clicks.trigger.all') }}
+      </NativeSelectOption>
+      <NativeSelectOption v-for="value in triggers" :key="value" :value="value">
+        {{ $t('clicks.dimensions.trigger') }}: {{ $t(`clicks.trigger.${value}`) }}
       </NativeSelectOption>
     </NativeSelect>
     <Button variant="outline" size="sm" :aria-label="$t('common.try_again')" @click="store.refresh()">

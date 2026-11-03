@@ -44,6 +44,8 @@ function label(value: ClickBreakdownRow['value']) {
     return t(`clicks.weekdays.${value}`)
   if (props.dimension === 'hour')
     return `${String(value).padStart(2, '0')}:00`
+  if (props.dimension === 'trigger')
+    return t(`clicks.trigger.${value}`)
   return String(value)
 }
 

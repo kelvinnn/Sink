@@ -3,7 +3,7 @@ import type { ClickDimension } from '#shared/schemas/click'
 
 const { canSeeIps } = useDashboardSession()
 const allGroups: ClickDimension[][] = [
-  ['slug', 'tags', 'source', 'refererHost', 'inApp', 'served'],
+  ['slug', 'trigger', 'tags', 'source', 'refererHost', 'inApp', 'served'],
   ['asOrg', 'networkType', 'ip', 'visitorId', 'knownIpLabel', 'botReason'],
   ['deviceType', 'os', 'browser', 'language', 'country', 'city', 'postalCode', 'day', 'hour', 'weekday'],
 ]
