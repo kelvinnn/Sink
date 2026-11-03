@@ -35,7 +35,7 @@ const form = useForm({
   onSubmit: async ({ value }) => {
     try {
       const linkData = normalizeLinkFormSubmitPayload(value, props.isEdit)
-      const { link: newLink } = await useAPI<{ link: DashboardLink }>(
+      const { link: newLink, warnings } = await useAPI<{ link: DashboardLink, warnings?: string[] }>(
         props.isEdit ? '/api/link/edit' : '/api/link/create',
         {
           method: props.isEdit ? 'PUT' : 'POST',
@@ -44,11 +44,18 @@ const form = useForm({
       )
       emit('success', newLink)
       toast(props.isEdit ? t('links.update_success') : t('links.create_success'))
+      // Fork: admins may save destinations outside the allow-list, with a warning.
+      if (warnings?.length)
+        toast.warning(t('links.destination_warning'), { description: warnings.join('\n'), duration: 15_000 })
     }
     catch (error) {
       console.error(error)
+      // Fork: show the server's reason (e.g. destination not on the allow-list) on the URL field.
+      const { statusCode, data } = error as { statusCode?: number, data?: { statusMessage?: string } }
+      if (statusCode === 422 && data?.statusMessage)
+        form.setFieldMeta('url', meta => ({ ...meta, isTouched: true, errorMap: { ...meta.errorMap, onSubmit: data.statusMessage } }))
       toast.error(props.isEdit ? t('links.update_failed') : t('links.create_failed'), {
-        description: error instanceof Error ? error.message : String(error),
+        description: data?.statusMessage || (error instanceof Error ? error.message : String(error)),
       })
     }
   },

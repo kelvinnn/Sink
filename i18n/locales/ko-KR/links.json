@@ -147,6 +147,7 @@
     "create_failed": "링크 생성에 실패했습니다",
     "ai_slug_failed": "AI 슬러그 생성에 실패했습니다",
     "ai_og_failed": "AI OpenGraph 생성에 실패했습니다",
-    "ai_og_success": "AI OpenGraph가 성공적으로 생성되었습니다"
+    "ai_og_success": "AI OpenGraph가 성공적으로 생성되었습니다",
+    "destination_warning": "Saved, but the destination is not on the allow-list"
   }
 }

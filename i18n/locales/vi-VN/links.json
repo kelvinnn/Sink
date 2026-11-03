@@ -147,6 +147,7 @@
     "create_failed": "Tạo liên kết thất bại",
     "ai_slug_failed": "Tạo slug AI thất bại",
     "ai_og_failed": "Không thể tạo AI OpenGraph",
-    "ai_og_success": "Tạo AI OpenGraph thành công"
+    "ai_og_success": "Tạo AI OpenGraph thành công",
+    "destination_warning": "Saved, but the destination is not on the allow-list"
   }
 }

@@ -67,6 +67,7 @@ export default eventHandler(async (event) => {
     }))
 
     const writable = prepared.filter(item => 'link' in item)
+    writable.forEach(item => assertDestinationAllowed(event, item.link!)) // Fork: destination allow-list
     const writeResults = await createLinks(event, writable.map(item => item.link!))
     let writeIndex = 0
     for (const item of prepared) {

@@ -147,6 +147,7 @@
     "create_failed": "Link konnte nicht erstellt werden",
     "ai_slug_failed": "KI-Slug konnte nicht generiert werden",
     "ai_og_failed": "Fehler beim Generieren des KI-OpenGraph",
-    "ai_og_success": "KI-OpenGraph erfolgreich generiert"
+    "ai_og_success": "KI-OpenGraph erfolgreich generiert",
+    "destination_warning": "Saved, but the destination is not on the allow-list"
   }
 }

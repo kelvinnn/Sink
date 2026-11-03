@@ -55,6 +55,8 @@ export default defineNuxtConfig({
     adminEmails: '',
     defaultRole: 'editor',
     allowedEmailDomains: '',
+    // Fork: comma-separated destination hosts (a host also allows its subdomains). Empty = any host.
+    allowedDestinationHosts: '',
     public: {
       previewMode: '',
       slugDefaultLength: '6',

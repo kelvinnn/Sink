@@ -147,6 +147,7 @@
     "create_failed": "Échec de la création du lien",
     "ai_slug_failed": "Échec de la génération du slug IA",
     "ai_og_failed": "Échec de la génération de l'OpenGraph IA",
-    "ai_og_success": "OpenGraph IA généré avec succès"
+    "ai_og_success": "OpenGraph IA généré avec succès",
+    "destination_warning": "Saved, but the destination is not on the allow-list"
   }
 }

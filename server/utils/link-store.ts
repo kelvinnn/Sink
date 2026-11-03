@@ -74,6 +74,7 @@ export async function getLinkWithMetadata(event: H3Event, slug: string): Promise
 export async function createLink(event: H3Event, link: Link): Promise<boolean> {
   // Fork: an expired link with the same slug is overwritten by a create; keep its last version.
   const replaced = await d1GetAnyLink(event, link.slug).catch(() => null)
+  assertDestinationAllowed(event, link) // Fork: destination allow-list
   const result = await d1CreateLink(event, link)
   if (!result.created)
     return false
@@ -151,6 +152,7 @@ export async function updateLink(event: H3Event, link: Link, expected?: Expected
   const previous = await d1GetAnyLink(event, link.slug)
   if (previous)
     await assertLinkUnlocked(event, previous)
+  assertDestinationAllowed(event, link, previous)
   const result = await d1UpdateLink(event, link, expected)
   if (!result.updated)
     return false

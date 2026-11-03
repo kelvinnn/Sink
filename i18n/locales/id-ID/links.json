@@ -147,6 +147,7 @@
     "create_failed": "Gagal membuat tautan",
     "ai_slug_failed": "Gagal membuat slug AI",
     "ai_og_failed": "Gagal membuat OpenGraph AI",
-    "ai_og_success": "OpenGraph AI berhasil dibuat"
+    "ai_og_success": "OpenGraph AI berhasil dibuat",
+    "destination_warning": "Saved, but the destination is not on the allow-list"
   }
 }

@@ -249,3 +249,37 @@ describe('qr style setting', () => {
     expect(entry).toMatchObject({ targetId: 'qr-style', after: { foreground: '#7a1f1f', logo: expect.stringMatching(/^\(image, \d+ KB\)$/) } })
   })
 })
+
+describe('destination allow-list', () => {
+  afterAll(() => {
+    env.NUXT_ALLOWED_DESTINATION_HOSTS = ''
+  })
+
+  it('blocks editors with 422, lets admins save with a warning, and keeps unchanged hosts editable', async () => {
+    const legacy = newSlug('dest-legacy')
+    expect((await as(EDITOR, '/api/link/create', { method: 'POST', body: { url: 'https://legacy.test/x', slug: legacy } })).status).toBe(201)
+
+    env.NUXT_ALLOWED_DESTINATION_HOSTS = 'example.com'
+    const ok = newSlug('dest-ok')
+    const allowed = await as(EDITOR, '/api/link/create', { method: 'POST', body: { url: 'https://shop.example.com/a', slug: ok } })
+    expect(allowed.status).toBe(201)
+    expect(await allowed.json()).not.toHaveProperty('warnings')
+
+    const blocked = await as(EDITOR, '/api/link/create', { method: 'POST', body: { url: 'https://evil.test/a', slug: newSlug('dest-bad') } })
+    expect(blocked.status).toBe(422)
+    expect((await blocked.json() as { statusMessage: string }).statusMessage).toContain('evil.test')
+    expect((await as(EDITOR, '/api/link/edit', { method: 'PUT', body: { url: 'https://evil.test/b', slug: ok } })).status).toBe(422)
+    expect((await as(EDITOR, '/api/link/edit', { method: 'PUT', body: { url: 'https://example.com/b', slug: ok, geo: { SG: 'https://evil.test/sg' } } })).status).toBe(422)
+
+    // A destination the link already had stays editable (e.g. changing the comment).
+    expect((await as(EDITOR, '/api/link/edit', { method: 'PUT', body: { url: 'https://legacy.test/x', slug: legacy, comment: 'still here' } })).status).toBe(201)
+
+    const adminSave = await as(ADMIN, '/api/link/create', { method: 'POST', body: { url: 'https://evil.test/admin', slug: newSlug('dest-admin') } })
+    expect(adminSave.status).toBe(201)
+    expect((await adminSave.json() as { warnings: string[] }).warnings[0]).toContain('evil.test')
+
+    const imported = await as(ADMIN, '/api/link/import', { method: 'POST', body: { version: '1.0', links: [{ url: 'https://evil.test/imp', slug: newSlug('dest-imp') }] } })
+    expect(imported.status).toBe(200)
+    expect((await imported.json() as { warnings: string[] }).warnings).toHaveLength(1)
+  })
+})

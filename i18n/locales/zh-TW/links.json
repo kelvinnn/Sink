@@ -147,6 +147,7 @@
     "create_failed": "創建連結失敗",
     "ai_slug_failed": "AI 生成短連結失敗",
     "ai_og_failed": "生成 AI OpenGraph 失敗",
-    "ai_og_success": "成功生成 AI OpenGraph"
+    "ai_og_success": "成功生成 AI OpenGraph",
+    "destination_warning": "Saved, but the destination is not on the allow-list"
   }
 }

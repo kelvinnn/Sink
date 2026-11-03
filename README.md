@@ -26,6 +26,7 @@ Hosted shorteners such as Bitly, Short.io, Rebrandly and Dub typically put retar
 | Restore deleted links and revert to any earlier version | — | ✅ |
 | Link locks (optionally until a date) for links on printed materials | — | ✅ |
 | Branded QR codes: colours, dot / corner style, centre logo, print-size PNG and SVG, one house style | Colour only | ✅ |
+| Destination allow-list: editors can only link to approved domains | — | ✅ |
 | Hidden admin: dashboard, API and assets invisible on your public short domain | — | ✅ |
 | Everything in Sink: analytics, QR codes, AI slugs, geo / device routing, import / export, MCP | ✅ | ✅ |
 
@@ -66,6 +67,7 @@ Put the dashboard behind [Cloudflare Access](https://docs.sink.cool/configuratio
 - **Created by / edited by** on every link card.
 - **Link locks:** an admin can lock a link, until unlocked or until a date, with a reason. Editors cannot change or delete a locked link. Made for links printed on menus, packaging and signage.
 - **Privacy by role:** raw IPs, visitor ids and CSV export are admin-only.
+- **Destination allow-list:** set `NUXT_ALLOWED_DESTINATION_HOSTS` (for example `example.com,wa.me,instagram.com`; each entry also allows its subdomains) and editors can no longer create, edit or import links that point anywhere else: the form shows the reason (HTTP 422). Admins can still save, with a warning. Links that already point to an unlisted host keep working and stay editable as long as that host doesn't change. Every destination is checked: main URL, app-store URLs and geo routes.
 
 ### 🔳 Branded QR codes for print
 An admin sets one **QR style** for the whole dashboard (Settings → QR style), with a live preview: dot, background and finder colours, dot style, corner style, error correction (auto = H when there is a centre image), an optional centre logo (PNG or SVG) and an optional scan marker (`?utm_medium=qr_code` or `?qr=1`) so scans show up as QR scans in the click log. Every link's QR code then uses that style, and anyone can download it as a 2048 px PNG (≈ 17 cm at 300 dpi) or as an SVG. Until a style is saved, QR codes look exactly like upstream.
@@ -93,6 +95,7 @@ Set `NUXT_ADMIN_HOST` (for example `admin.example.com`, behind Cloudflare Access
 | `NUXT_ADMIN_EMAILS` | *(empty)* | Comma-separated emails that are always admin |
 | `NUXT_DEFAULT_ROLE` | `editor` | Role for new Access users: `admin`, `editor` or `viewer` |
 | `NUXT_ALLOWED_EMAIL_DOMAINS` | *(empty)* | Optional extra check on top of the Access policy |
+| `NUXT_ALLOWED_DESTINATION_HOSTS` | *(empty)* | Comma-separated destination hosts editors may link to (subdomains included). Empty = any host |
 | `NUXT_ADMIN_GATE_PATH` | *(empty)* | Alternative to the admin host: secret path that unlocks the dashboard. Set it as a secret |
 
 Deploy exactly as upstream ([Workers guide](https://docs.sink.cool/deployment/workers)), then add the variables you want under **Worker → Settings → Variables and Secrets**. For a GTM page that behaves like classic redirects, also set `NUXT_REDIRECT_STATUS_CODE=302` and `NUXT_REDIRECT_WITH_QUERY=true`.
